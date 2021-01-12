@@ -55,5 +55,3 @@ class MetaKumoko:
     best_idx = np.argmax(self.scores)
     self.our_last_move = self.proposed_actions[best_idx]
     return self.our_last_move
-
-

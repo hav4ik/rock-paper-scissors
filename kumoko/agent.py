@@ -11,14 +11,14 @@ from kumoko.ensembles import ENSEMBLES
 
 
 # Default values
-ENSEMBLE = ENSEMBLES['4_strats_v1']
+ENSEMBLE = ENSEMBLES['rfind_v1']
 USE_META = True
 
 # Read from OS environ
 if 'KENSEMBLE' in os.environ:
   ENSEMBLE = ENSEMBLES[os.environ['KENSEMBLE']]
 if 'KMETA' in os.environ:
-  USE_META = bool(os.environ['KMETA'])
+  USE_META = (os.environ['KMETA'] == 'True')
 
 global kumoko_agent
 global latest_action
@@ -27,14 +27,10 @@ latest_action = None
 if USE_META:
   kumoko_agent = MetaKumoko(
       KumokoV1,
-      kumoko_args=[
-        ENSEMBLE.strategies(),
-        ENSEMBLE.scoring_funcs()
-      ])
+      kumoko_args=[ENSEMBLE])
 else:
   kumoko_agent = KumokoV1(
-      ENSEMBLE.strategies(),
-      ENSEMBLE.scoring_funcs())
+      ensemble=ENSEMBLE)
 
 
 def agent(obs, conf):

@@ -106,25 +106,25 @@ class _Submission:
 
 class HPSDojoStrategy(BaseAtomicStrategy):
   def __init__(self):
-    self.submission = _Submission(verbose=True)
-    self.step = 0
+    self.submission = _Submission(verbose=False)
 
   def __call__(self, history):
-    T = self.step
+    T = len(history)
     if T > 0:
-      A = history.his_moves[-1]
+      A = MOVE_TO_NUM[history.his_moves[-1]]
     else:
       A = None
     S = 3
-    self.step += 1
 
-def agent(observation, configuration):
-    T = observation.step
-    A = observation.lastOpponentAction if T > 0 else None
-    S = configuration.signs
+    return NUM_TO_MOVE[int(self.submission.next_action(T, A, S))]
 
-    try:
-        return NUM_TO_MOVE[int(self.submission.next_action(T, A, S))]
-    except Exception as e:
-        print(T, f'Failed', e)
-        return random.choice('RPS')
+# def agent(observation, configuration):
+#     T = observation.step
+#     A = observation.lastOpponentAction if T > 0 else None
+#     S = configuration.signs
+# 
+#     try:
+#         return NUM_TO_MOVE[int(self.submission.next_action(T, A, S))]
+#     except Exception as e:
+#         print(T, f'Failed', e)
+#         return random.choice('RPS')

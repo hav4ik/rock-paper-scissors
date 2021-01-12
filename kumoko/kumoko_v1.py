@@ -4,14 +4,20 @@ from kumoko.kumoko_meta import *
 
 
 class KumokoV1:
-  def __init__(self, strategies, scoring_funcs):
+  def __init__(self, ensemble):
     """Define scoring functions and strategies"""
     self.proposed_actions = []
     self.proposed_meta_actions = []
     self.our_last_move = None
     self.holistic_history = HolisticHistoryHolder()
-    self.strategies = strategies
-    self.scoring_funcs = scoring_funcs
+    self.strategies = ensemble.generate_strategies()
+    self.scoring_funcs = ensemble.generate_scoring_funcs()
+
+    # Assert that all strats are unique objects
+    strat_ids = set()
+    for strategy in self.strategies:
+      strat_ids.add(id(strategy))
+    assert len(strat_ids) == len(self.strategies)
 
     # Add initial scores for each strategy in the list
     self.scores = 3. * np.ones(
@@ -22,11 +28,11 @@ class KumokoV1:
 
     # Add meta-scores for each of the scoring function
     self.meta_scoring_func = get_dllu_scoring(
-        decay=1.0,
+        decay=0.94,
         win_value=3.0,
         draw_value=0.0,
         lose_value=-3.0,
-        drop_prob=0.0,
+        drop_prob=0.87,
         drop_draw=False,
         clip_zero=True)
 

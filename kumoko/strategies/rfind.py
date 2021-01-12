@@ -3,9 +3,10 @@ from kumoko.kumoko_base import *
 
 
 class RFindStrategy(BaseAtomicStrategy):
-  def __init__(self, limit=None, src='his'):
+  def __init__(self, limit=None, src='his', shenanigans=True):
     self.limit = limit
     self.src = src
+    self.shenanigans = shenanigans
 
   def __call__(self, history):
     if len(history) == 0:
@@ -33,18 +34,22 @@ class RFindStrategy(BaseAtomicStrategy):
         not sequence[length - lb:length] in sequence[0:length - 1]:
       lb -= 1
     if lb >= 1:
-      if random.random() < 0.6:
-        idx = sequence.rfind(
-            sequence[length - lb:length], 0, length - 1)
-      elif random.random() < 0.5:
-        idx = sequence.rfind(
-            sequence[length - lb:length], 0, length - 1)
-        idx2 = sequence.rfind(
-            sequence[length - lb:length], 0, idx)
-        if idx2 != -1:
-          idx = idx2
+      if self.shenanigans:
+        if random.random() < 0.6:
+          idx = sequence.rfind(
+              sequence[length - lb:length], 0, length - 1)
+        elif random.random() < 0.5:
+          idx = sequence.rfind(
+              sequence[length - lb:length], 0, length - 1)
+          idx2 = sequence.rfind(
+              sequence[length - lb:length], 0, idx)
+          if idx2 != -1:
+            idx = idx2
+        else:
+          idx = sequence.find(
+              sequence[length - lb:length], 0, length - 1)
       else:
-        idx = sequence.find(
+        idx = sequence.rfind(
             sequence[length - lb:length], 0, length - 1)
       return BEAT[history.his_moves[idx + lb]]
     else:
