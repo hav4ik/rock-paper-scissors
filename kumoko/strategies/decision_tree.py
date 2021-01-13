@@ -98,6 +98,3 @@ class DecisionTreeStrategy(BaseAtomicStrategy):
       self.step += 1
 
       return NUM_TO_MOVE[action]
-
-
-
