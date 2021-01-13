@@ -1,5 +1,6 @@
 import random
 from kumoko.kumoko_base import *
+from kumoko.kumoko_v1 import KumokoV1
 
 
 class RFindStrategy(BaseAtomicStrategy):
@@ -54,3 +55,65 @@ class RFindStrategy(BaseAtomicStrategy):
       return BEAT[history.his_moves[idx + lb]]
     else:
       return random.choice('RPS')
+
+
+class WrappedRFindStrategy(BaseAtomicStrategy):
+  """A strategy that contains a Kumoko inside!
+  """
+  class _RFindInner:
+    """Only Rfind, nothing else!
+    """
+    def __init__(self, limits, sources, shenanigans=True):
+      self.limits = limits
+      self.sources = sources
+      self.shenanigans = shenanigans
+
+    def generate_strategies(self):
+      """List of strategies (including mirror strategies)
+      """
+      strategies = []
+
+      # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+      limits=[50, 20, 10]
+      sources = ['his', 'our', 'dna']
+      for limit in limits:
+        for source in sources:
+          strategies.extend(
+              generate_meta_strategy_pair(
+                RFindStrategy,
+                limit=limit,
+                src=source,
+                shenanigans=False,
+              ))
+
+      return strategies
+
+    def generate_scoring_funcs(self):
+      """List of scoring functions
+      """
+      # Add DLLU's scoring methods from his blog
+      # https://daniel.lawrence.lu/programming/rps/
+      dllu_scoring_configs = [
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+          [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
+          [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
+      ]
+      scoring_funcs = [
+          get_dllu_scoring(*cfg)
+          for cfg in dllu_scoring_configs]
+      return scoring_funcs
+
+  def __init__(self, limits, sources, shenanigans=True):
+    ensemble = self._RFindInner(limits, sources, shenanigans)
+    self.kumoko = KumokoV1(ensemble=ensemble)
+
+  def __call__(self, history):
+    if len(history) > 0:
+      our_last_move = history.our_moves[-1]
+      his_last_move = history.his_moves[-1]
+    else:
+      our_last_move = None
+      his_last_move = None
+    return self.kumoko.next_action(our_last_move, his_last_move)

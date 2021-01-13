@@ -8,21 +8,6 @@ import multiprocessing as pymp
 from tqdm import tqdm
 
 
-# Parse cmd line input
-parser = ArgumentParser()
-parser.add_argument('-m', '--multiprocessing', action='store_true')
-args = parser.parse_args()
-
-# Form list of enemies
-agents = [
-    os.path.join('opponents', agent_file)
-    for agent_file in os.listdir('opponents')
-    if os.path.splitext(agent_file)[-1] == '.py']
-
-# Agent to eval
-agent_to_eval = os.path.join('kumoko', 'agent.py')
-
-
 # function to return score
 def get_result(match_settings):
     start = datetime.now()
@@ -43,13 +28,16 @@ def get_result(match_settings):
     elapsed = datetime.now() - start
     opponent_name = os.path.basename(match_settings[1])
     opponent_name = os.path.splitext(opponent_name)[0]
-    print(f'... vs {opponent_name:<30} --- {won:2d}/{tie:2d}/{lost:2d} --- {avg_score}')
+    print(f'{opponent_name:<30} --- {won:2d}/{tie:2d}/{lost:2d} --- {avg_score}')
     return match_settings[1], won, lost, tie, elapsed, float(avg_score) / float(match_settings[2])
 
 
 def eval_agent_against_baselines(agent, baselines, num_episodes=10):
     print('')
     print(f'Evaluating {agent}:')
+    print('-' * (30 + 5 + 8 + 5 + 7))
+    print(f'{"opponent_name":<30} --- {"w":>2}/{"t":>2}/{"l":>2} --- {"avg"}')
+    print('-' * (30 + 5 + 8 + 5 + 7))
     df = pd.DataFrame(
         columns=['wins', 'loses', 'ties', 'total time', 'avg. score'],
         index=baselines)
@@ -75,4 +63,18 @@ def eval_agent_against_baselines(agent, baselines, num_episodes=10):
     return df
 
 
-df = eval_agent_against_baselines(agent_to_eval, agents)
+if __name__ == '__main__':
+  # Parse cmd line input
+  parser = ArgumentParser()
+  parser.add_argument('-m', '--multiprocessing', action='store_true')
+  args = parser.parse_args()
+
+  # Form list of enemies
+  agents = [
+      os.path.join('opponents', agent_file)
+      for agent_file in os.listdir('opponents')
+      if os.path.splitext(agent_file)[-1] == '.py']
+
+  # Agent to eval
+  agent_to_eval = os.path.join('kumoko', 'agent.py')
+  df = eval_agent_against_baselines(agent_to_eval, agents)

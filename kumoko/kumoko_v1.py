@@ -4,14 +4,19 @@ from kumoko.kumoko_meta import *
 
 
 class KumokoV1:
-  def __init__(self, ensemble):
-    """Define scoring functions and strategies"""
+  def __init__(self, ensemble, action_choice='best'):
+    """
+    Arguments:
+      ensemble: implementation of EnsembleBase interface
+      action_choice: either 'best', 'vote', or 'stochastic'
+    """
     self.proposed_actions = []
     self.proposed_meta_actions = []
     self.our_last_move = None
     self.holistic_history = HolisticHistoryHolder()
     self.strategies = ensemble.generate_strategies()
     self.scoring_funcs = ensemble.generate_scoring_funcs()
+    self.action_choice = action_choice
 
     # Assert that all strats are unique objects
     strat_ids = set()
@@ -99,19 +104,43 @@ class KumokoV1:
             CEDE[self.proposed_actions[st]]
 
     # For each scoring function (selector), choose the
-    # action with highest score
-    best_actions_idx = np.argmax(self.scores, axis=1)
-    if DEBUG_MODE:
-      assert best_actions_idx.shape == \
-        (len(self.scoring_funcs), )
-    self.proposed_meta_actions = [
-        self.proposed_actions[idx]
-        for idx in best_actions_idx]
+    # action based on all of our policy actors
+
+    if self.action_choice == 'best':
+      # Simply choose the action with best score
+      best_actions_idx = np.argmax(self.scores, axis=1)
+      if DEBUG_MODE:
+        assert best_actions_idx.shape == \
+          (len(self.scoring_funcs), )
+
+      self.proposed_meta_actions = [
+          self.proposed_actions[idx]
+          for idx in best_actions_idx]
+
+    elif self.action_choice == 'vote':
+      # Vote by summing the score for each action
+      action_cum_scores = np.zeros(
+          shape=(len(scoring_funcs), 3))
+
+      for sf in range(len(self.scoring_funcs)):
+        for pa, action in enumerate(self.proposed_actions):
+          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
+              self.scores[sf, pa]
+
+      self.proposed_meta_actions = [
+          NUM_TO_MOVE[voted_a]
+          for voted_a in np.argmax(action_cum_scores, axis=1)]
+
+    else:
+      # Not implemented
+      raise NotImplementedError(
+        f'Action choice {self.action_choice} is not implemented.')
 
     # Meta-Selector: selecting the scoring function
     if DEBUG_MODE:
       assert len(self.meta_scores) == \
         len(self.proposed_meta_actions)
+
     best_meta_action_idx = np.argmax(self.meta_scores)
     self.our_last_move = \
       self.proposed_meta_actions[best_meta_action_idx]
