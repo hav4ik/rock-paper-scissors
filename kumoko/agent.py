@@ -35,17 +35,20 @@ current_score = 0
 if USE_META:
   kumoko_agent = MetaKumoko(
       KumokoV1,
-      kumoko_args=[ENSEMBLE])
+      kumoko_kwargs={
+        'ensemble': ENSEMBLE,
+        'action_choice': ACTION_CHOICE
+      })
 else:
   kumoko_agent = KumokoV1(
-      ensemble=ENSEMBLE)
+      ensemble=ENSEMBLE,
+      action_choice=ACTION_CHOICE)
 
 
 def agent(obs, conf):
   global kumoko_agent
   global latest_action
   global current_score
-  # return random.randint(0,2)
 
   if obs.step == 0:
     s_move = kumoko_agent.next_action(None, None)

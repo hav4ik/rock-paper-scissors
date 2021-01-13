@@ -120,7 +120,7 @@ class KumokoV1:
     elif self.action_choice == 'vote':
       # Vote by summing the score for each action
       action_cum_scores = np.zeros(
-          shape=(len(scoring_funcs), 3))
+          shape=(len(self.scoring_funcs), 3))
 
       for sf in range(len(self.scoring_funcs)):
         for pa, action in enumerate(self.proposed_actions):
