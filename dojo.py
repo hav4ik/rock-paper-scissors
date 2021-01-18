@@ -182,9 +182,29 @@ if __name__ == '__main__':
     elif args.dojo == 'kumo':
       cfgs = [
           {
-            'name': '5_strats_v1a',
+            'name': '4_strats_v1a',
             'kwargs': {
-              'ensemble': '5_strats_v1a',
+              'ensemble': '4_strats_v1a',
+              'scoring': 'std_dllu_v1',
+              'use_meta': True,
+              'fu_thresh': None,
+              'action_choice': 'best',
+            }
+          },
+          {
+            'name': '4_strats_v2b',
+            'kwargs': {
+              'ensemble': '4_strats_v2b',
+              'scoring': 'std_dllu_v1',
+              'use_meta': True,
+              'fu_thresh': None,
+              'action_choice': 'best',
+            }
+          },
+          {
+            'name': '5_strats_v2b',
+            'kwargs': {
+              'ensemble': '5_strats_v2b',
               'scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
