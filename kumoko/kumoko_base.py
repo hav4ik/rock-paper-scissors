@@ -93,4 +93,4 @@ def generate_meta_strategy_pair(atomic_strategy_cls,
     return _actual_strategy, _mirror_strategy
 
   else:
-    return _actual_strategy
+    return [_actual_strategy]

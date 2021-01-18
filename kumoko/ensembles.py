@@ -27,8 +27,8 @@ class Testing:
     strategies.extend(
         generate_meta_strategy_pair(
           CentrifugalBumblepuppy16h))
-
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class RFindOnlyV1:
@@ -52,7 +52,8 @@ class RFindOnlyV1:
               src=source,
               shenanigans=True,
             ))
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class FourStratsV1a:
@@ -94,7 +95,8 @@ class FourStratsV1a:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class FourStratsV1:
@@ -136,7 +138,8 @@ class FourStratsV1:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class FourStratsV2a:
@@ -176,7 +179,8 @@ class FourStratsV2a:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class FourStratsV2b:
@@ -216,7 +220,8 @@ class FourStratsV2b:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 class FourStratsV2c:
@@ -256,7 +261,81 @@ class FourStratsV2c:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
+class FourStratsV3a:
+  """
+  Contains 4 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
+class FourStratsV3b:
+  """
+  Contains 4 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies, do_rotations = [], []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(
+          CentrifugalBumblepuppy16h,
+          mirroring=False))
+    do_rotations.extend([False])
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+    do_rotations.extend([True, True])
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+    do_rotations.extend([True, True])
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+    do_rotations.extend([True, True])
+
+    return strategies, do_rotations
 
 
 class FiveStratsV1a:
@@ -300,47 +379,8 @@ class FiveStratsV1a:
     strategies.extend(
         generate_meta_strategy_pair(MemoryPatternsV7Strategy))
 
-    return strategies
-
-
-class FourStratsV3a:
-  """
-  Contains 4 type of strategies:
-  - RFindWrapped (with 4 windows and 3 sources wrapped inside a Kumoko)
-  - DecisionTree
-  - HPSDojo (from high performance notebook)
-  - TestingPleaseIgnore
-  """
-  @staticmethod
-  def generate():
-    """List of strategies (including mirror strategies)
-    """
-    strategies = []
-
-    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
-    limits=[50, 20, 10]
-    sources = ['his', 'our', 'dna']
-
-    strategies.extend(
-        generate_meta_strategy_pair(
-          WrappedRFindStrategy,
-          limits=limits,
-          sources=sources,
-          shenanigans=False))
-
-    # Add decision tree strategies
-    strategies.extend(
-        generate_meta_strategy_pair(DecisionTreeStrategy))
-
-    # Add HPS Dojo strategies
-    strategies.extend(
-        generate_meta_strategy_pair(HPSDojoStrategy))
-
-    # Add testing please ignore strategies
-    strategies.extend(
-        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
-
-    return strategies
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
 
 
 ENSEMBLES = {
@@ -355,6 +395,7 @@ ENSEMBLES = {
   '4_strats_v2b': FourStratsV2b,
   '4_strats_v2c': FourStratsV2c,
   '4_strats_v3a': FourStratsV3a,
+  '4_strats_v3b': FourStratsV3b,
 
   # Ensembles with 5 strategies
   '5_strats_v1a': FiveStratsV1a

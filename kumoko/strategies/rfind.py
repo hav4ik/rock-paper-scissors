@@ -87,7 +87,8 @@ class WrappedRFindStrategy(BaseAtomicStrategy):
                 shenanigans=False,
               ))
 
-      return strategies
+      do_rotations = [True for _ in strategies]
+      return strategies, do_rotations
 
   class _RFindInnerScoring:
     def generate_normal(self):

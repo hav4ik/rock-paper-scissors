@@ -14,7 +14,7 @@ class Kumoko:
     self.proposed_meta_actions = []
     self.our_last_move = None
     self.holistic_history = HolisticHistoryHolder()
-    self.strategies = ensemble.generate()
+    self.strategies, self.do_rotations = ensemble.generate()
     self.scoring_funcs = scoring.generate_normal()
     self.action_choice = action_choice
 
@@ -24,10 +24,17 @@ class Kumoko:
       strat_ids.add(id(strategy))
     assert len(strat_ids) == len(self.strategies)
 
+    # Count strategies with rotation
+    self.n_strats_with_rots = 0
+    for x in self.do_rotations:
+      if x is True:
+        self.n_strats_with_rots += 1
+    self.n_all_strats = \
+      len(self.strategies) + 2 * self.n_strats_with_rots
+
     # Add initial scores for each strategy in the list
     self.scores = 3. * np.ones(
-        shape=(len(self.scoring_funcs),
-               3 * len(self.strategies)))
+        shape=(len(self.scoring_funcs), self.n_all_strats))
     self.proposed_actions = [
       random.choice('RPS')] * self.scores.shape[1]
 
@@ -60,7 +67,7 @@ class Kumoko:
 
       if DEBUG_MODE:
         assert len(self.proposed_actions) == \
-          3 * len(self.strategies)
+          self.n_all_strats
         assert len(self.proposed_meta_actions) == \
           len(self.meta_scores)
         assert self.scores.shape[0] == \
@@ -86,15 +93,23 @@ class Kumoko:
       self.proposed_actions = \
           [random.choice('RPS')] * (len(self.strategies) * 3)
     else:
+      strats_with_rots_counter = 0
       for st in range(len(self.strategies)):
         proposed_action = \
           self.strategies[st](self.holistic_history)
         if proposed_action is not None:
           self.proposed_actions[st] = proposed_action
-          self.proposed_actions[st + len(self.strategies)] = \
-            BEAT[self.proposed_actions[st]]
-          self.proposed_actions[st + 2 * len(self.strategies)] = \
-            CEDE[self.proposed_actions[st]]
+          if self.do_rotations[st]:
+            self.proposed_actions[
+                strats_with_rots_counter + \
+                len(self.strategies)] = \
+              BEAT[self.proposed_actions[st]]
+            self.proposed_actions[
+                strats_with_rots_counter + \
+                self.n_strats_with_rots + \
+                len(self.strategies)] = \
+              CEDE[self.proposed_actions[st]]
+            strats_with_rots_counter += 1
 
     # For each scoring function (selector), choose the
     # action based on all of our policy actors
