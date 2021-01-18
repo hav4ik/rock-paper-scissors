@@ -3,8 +3,8 @@ from kumoko.kumoko_base import *
 from kumoko.kumoko_meta import *
 
 
-class KumokoV1:
-  def __init__(self, ensemble, action_choice='best'):
+class Kumoko:
+  def __init__(self, ensemble, scoring, action_choice='best'):
     """
     Arguments:
       ensemble: implementation of EnsembleBase interface
@@ -14,8 +14,8 @@ class KumokoV1:
     self.proposed_meta_actions = []
     self.our_last_move = None
     self.holistic_history = HolisticHistoryHolder()
-    self.strategies = ensemble.generate_strategies()
-    self.scoring_funcs = ensemble.generate_scoring_funcs()
+    self.strategies = ensemble.generate()
+    self.scoring_funcs = scoring.generate_normal()
     self.action_choice = action_choice
 
     # Assert that all strats are unique objects
@@ -32,14 +32,7 @@ class KumokoV1:
       random.choice('RPS')] * self.scores.shape[1]
 
     # Add meta-scores for each of the scoring function
-    self.meta_scoring_func = get_dllu_scoring(
-        decay=0.94,
-        win_value=3.0,
-        draw_value=0.0,
-        lose_value=-3.0,
-        drop_prob=0.87,
-        drop_draw=False,
-        clip_zero=True)
+    self.meta_scoring_func = scoring.get_meta_scoring()
 
     self.meta_scores = 3. * np.ones(
         shape=(len(self.scoring_funcs)))

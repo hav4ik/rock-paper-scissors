@@ -1,6 +1,7 @@
 import random
 from kumoko.kumoko_base import *
-from kumoko.kumoko_v1 import KumokoV1
+from kumoko.kumoko import Kumoko
+from kumoko.scoring import get_dllu_scoring
 
 
 class RFindStrategy(BaseAtomicStrategy):
@@ -60,7 +61,7 @@ class RFindStrategy(BaseAtomicStrategy):
 class WrappedRFindStrategy(BaseAtomicStrategy):
   """A strategy that contains a Kumoko inside!
   """
-  class _RFindInner:
+  class _RFindInnerEnsemble:
     """Only Rfind, nothing else!
     """
     def __init__(self, limits, sources, shenanigans=True):
@@ -68,7 +69,7 @@ class WrappedRFindStrategy(BaseAtomicStrategy):
       self.sources = sources
       self.shenanigans = shenanigans
 
-    def generate_strategies(self):
+    def generate(self):
       """List of strategies (including mirror strategies)
       """
       strategies = []
@@ -88,7 +89,8 @@ class WrappedRFindStrategy(BaseAtomicStrategy):
 
       return strategies
 
-    def generate_scoring_funcs(self):
+  class _RFindInnerScoring:
+    def generate_normal(self):
       """List of scoring functions
       """
       # Add DLLU's scoring methods from his blog
@@ -105,9 +107,23 @@ class WrappedRFindStrategy(BaseAtomicStrategy):
           for cfg in dllu_scoring_configs]
       return scoring_funcs
 
+    def get_meta_scoring(self):
+      """Generates a meta scoring function
+      """
+      meta_scoring_func = get_dllu_scoring(
+          decay=0.94,
+          win_value=3.0,
+          draw_value=0.0,
+          lose_value=-3.0,
+          drop_prob=0.87,
+          drop_draw=False,
+          clip_zero=True)
+      return meta_scoring_func
+
   def __init__(self, limits, sources, shenanigans=True):
-    ensemble = self._RFindInner(limits, sources, shenanigans)
-    self.kumoko = KumokoV1(ensemble=ensemble)
+    ensemble = self._RFindInnerEnsemble(limits, sources, shenanigans)
+    scoring = self._RFindInnerScoring()
+    self.kumoko = Kumoko(ensemble=ensemble, scoring=scoring)
 
   def __call__(self, history):
     if len(history) > 0:

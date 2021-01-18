@@ -8,47 +8,34 @@ from kumoko.strategies.decision_tree_v10 import DecisionTreeV10Strategy
 from kumoko.strategies.hps_dojo_agent import HPSDojoStrategy
 from kumoko.strategies.testing_pls_ignore import TestingPlsIgnoreStrategy
 from kumoko.strategies.memory_patterns_v7 import MemoryPatternsV7Strategy
+from kumoko.strategies.centrifugal_bumblepuppy import CentrifugalBumblepuppy16h
 
 
 class Testing:
   @staticmethod
-  def generate_strategies():
+  def generate():
     strategies = []
-    limits = [10, 20]
-    for limit in limits:
-      strategies.extend(
-          generate_meta_strategy_pair(
-            RFindStrategy,
-            limit=limit,
-            src='his',
-            shenanigans=True,
-          ))
-    return strategies
+    # limits = [10, 20]
+    # for limit in limits:
+    #   strategies.extend(
+    #       generate_meta_strategy_pair(
+    #         RFindStrategy,
+    #         limit=limit,
+    #         src='his',
+    #         shenanigans=True,
+    #       ))
+    strategies.extend(
+        generate_meta_strategy_pair(
+          CentrifugalBumblepuppy16h))
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
+    return strategies
 
 
 class RFindOnlyV1:
   """Only Rfind, nothing else!
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -67,24 +54,6 @@ class RFindOnlyV1:
             ))
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FourStratsV1a:
   """
@@ -95,7 +64,7 @@ class FourStratsV1a:
   - TestingPleaseIgnore
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -127,24 +96,6 @@ class FourStratsV1a:
 
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FourStratsV1:
   """
@@ -155,7 +106,7 @@ class FourStratsV1:
   - TestingPleaseIgnore
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -187,24 +138,6 @@ class FourStratsV1:
 
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FourStratsV2a:
   """
@@ -215,7 +148,7 @@ class FourStratsV2a:
   - TestingPleaseIgnore
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -245,24 +178,6 @@ class FourStratsV2a:
 
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FourStratsV2b:
   """
@@ -273,7 +188,7 @@ class FourStratsV2b:
   - TestingPleaseIgnore
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -303,24 +218,6 @@ class FourStratsV2b:
 
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FourStratsV2c:
   """
@@ -331,7 +228,7 @@ class FourStratsV2c:
   - TestingPleaseIgnore
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -361,24 +258,6 @@ class FourStratsV2c:
 
     return strategies
 
-  @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
-    """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
 
 class FiveStratsV1a:
   """
@@ -390,7 +269,7 @@ class FiveStratsV1a:
   - MemoryPatternsV7
   """
   @staticmethod
-  def generate_strategies():
+  def generate():
     """List of strategies (including mirror strategies)
     """
     strategies = []
@@ -423,25 +302,45 @@ class FiveStratsV1a:
 
     return strategies
 
+
+class FourStratsV3a:
+  """
+  Contains 4 type of strategies:
+  - RFindWrapped (with 4 windows and 3 sources wrapped inside a Kumoko)
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  """
   @staticmethod
-  def generate_scoring_funcs():
-    """List of scoring functions
+  def generate():
+    """List of strategies (including mirror strategies)
     """
-    # Add DLLU's scoring methods from his blog
-    # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
+    strategies = []
 
+    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+    limits=[50, 20, 10]
+    sources = ['his', 'our', 'dna']
 
+    strategies.extend(
+        generate_meta_strategy_pair(
+          WrappedRFindStrategy,
+          limits=limits,
+          sources=sources,
+          shenanigans=False))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    return strategies
 
 
 ENSEMBLES = {
@@ -455,6 +354,7 @@ ENSEMBLES = {
   '4_strats_v2a': FourStratsV2a,
   '4_strats_v2b': FourStratsV2b,
   '4_strats_v2c': FourStratsV2c,
+  '4_strats_v3a': FourStratsV3a,
 
   # Ensembles with 5 strategies
   '5_strats_v1a': FiveStratsV1a

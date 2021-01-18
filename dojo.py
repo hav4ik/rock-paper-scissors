@@ -1,4 +1,5 @@
 import os
+import uuid
 from argparse import ArgumentParser
 
 import pandas as pd
@@ -6,6 +7,45 @@ import kaggle_environments
 from datetime import datetime
 import multiprocessing as pymp
 from tqdm import tqdm
+
+from kumoko.agent import KumokoAgent
+from kumoko.ensembles import ENSEMBLES
+from kumoko.scoring import SCORINGS
+
+
+# Generate a full Kumoko agent file, with uuid
+def generate_kumoko_file(ensemble,
+                         scoring,
+                         use_meta,
+                         fu_thresh,
+                         action_choice,
+                         name=None,
+                         tmp_dir='/tmp/kumoko/'):
+  if not os.path.isdir(tmp_dir):
+    os.makedirs(tmp_dir)
+  if name is None:
+    name = uuid.uuid4().hex
+  kumoko_tmp_path = os.path.join(tmp_dir, f'kumoko_{name}.py')
+  code = f"""# This agent is generated
+from kumoko.agent import KumokoAgent
+from kumoko.ensembles import ENSEMBLES
+from kumoko.scoring import SCORINGS
+
+global kumoko_agent
+kumoko_agent = KumokoAgent(
+      ensemble=ENSEMBLES['{ensemble}'],
+      scoring=SCORINGS['{scoring}'],
+      use_meta={use_meta},
+      fuck_you_thresh={fu_thresh},
+      action_choice='{action_choice}')
+
+def agent(obs, cfg):
+  global kumoko_agent
+  return kumoko_agent(obs, cfg)
+"""
+  with open(kumoko_tmp_path, 'w') as f:
+    f.write(code)
+  return kumoko_tmp_path
 
 
 # function to return score
@@ -66,15 +106,36 @@ def eval_agent_against_baselines(agent, baselines, num_episodes=10):
 if __name__ == '__main__':
   # Parse cmd line input
   parser = ArgumentParser()
+  parser.add_argument('dojo')
   parser.add_argument('-m', '--multiprocessing', action='store_true')
+
+  kumoko_grp = parser.add_argument_group('kumoko args')
+  kumoko_grp.add_argument('-e', '--ensemble', default='rfind_v1')
+  kumoko_grp.add_argument('-s', '--scoring', default='std_dllu_v1')
+  kumoko_grp.add_argument('-u', '--use_meta', action='store_true')
+  kumoko_grp.add_argument('-f', '--fu_thresh', type=int, default=None)
+  kumoko_grp.add_argument('-c', '--action_choice', default='best')
   args = parser.parse_args()
 
-  # Form list of enemies
-  agents = [
-      os.path.join('opponents', agent_file)
-      for agent_file in os.listdir('opponents')
-      if os.path.splitext(agent_file)[-1] == '.py']
-
   # Agent to eval
-  agent_to_eval = os.path.join('kumoko', 'agent.py')
-  df = eval_agent_against_baselines(agent_to_eval, agents)
+  agent_to_eval = generate_kumoko_file(
+      ensemble=args.ensemble,
+      scoring=args.scoring,
+      use_meta=args.use_meta,
+      fu_thresh=args.fu_thresh,
+      action_choice=args.action_choice)
+
+  # Form list of enemies
+  if args.dojo == 'test':
+    env = kaggle_environments.make(
+        "rps", configuration={"episodeSteps": 100}, debug=True)
+    outcomes = env.run([agent_to_eval, agent_to_eval])
+
+  elif args.dojo == 'all':
+    agents = [
+        os.path.join('opponents', agent_file)
+        for agent_file in os.listdir('opponents')
+        if os.path.splitext(agent_file)[-1] == '.py']
+    df = eval_agent_against_baselines(agent_to_eval, agents)
+  else:
+    raise NotImplementedError(f'Wtf is {args.dojo}?')
