@@ -7,6 +7,7 @@ import kaggle_environments
 from datetime import datetime
 import multiprocessing as pymp
 from tqdm import tqdm
+import random
 
 from kumoko.agent import KumokoAgent
 from kumoko.ensembles import ENSEMBLES
@@ -19,6 +20,7 @@ def generate_kumoko_file(ensemble,
                          use_meta,
                          fu_thresh,
                          action_choice,
+                         verbose=False,
                          name=None,
                          tmp_dir='/tmp/kumoko/'):
   if not os.path.isdir(tmp_dir):
@@ -37,7 +39,8 @@ kumoko_agent = KumokoAgent(
       scoring=SCORINGS['{scoring}'],
       use_meta={use_meta},
       fuck_you_thresh={fu_thresh},
-      action_choice='{action_choice}')
+      action_choice='{action_choice}',
+      verbose=True)
 
 def agent(obs, cfg):
   global kumoko_agent
@@ -68,8 +71,9 @@ def get_result(match_settings):
     elapsed = datetime.now() - start
     opponent_name = os.path.basename(match_settings[1])
     opponent_name = os.path.splitext(opponent_name)[0]
+    avg_scopre = float(avg_score) / float(match_settings[2])
     print(f'{opponent_name:<30} --- {won:2d}/{tie:2d}/{lost:2d} --- {avg_score}')
-    return match_settings[1], won, lost, tie, elapsed, float(avg_score) / float(match_settings[2])
+    return match_settings[1], won, lost, tie, elapsed, avg_score
 
 
 def eval_agent_against_baselines(agent, baselines, num_episodes=10):
@@ -118,24 +122,80 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   # Agent to eval
-  agent_to_eval = generate_kumoko_file(
-      ensemble=args.ensemble,
-      scoring=args.scoring,
-      use_meta=args.use_meta,
-      fu_thresh=args.fu_thresh,
-      action_choice=args.action_choice)
-
-  # Form list of enemies
-  if args.dojo == 'test':
+  if args.dojo == 'perf':
+    agent_to_eval = generate_kumoko_file(
+        ensemble=args.ensemble,
+        scoring=args.scoring,
+        use_meta=args.use_meta,
+        fu_thresh=args.fu_thresh,
+        action_choice=args.action_choice,
+        verbose=True)
+    trivial_opponent = lambda obs, cfg: random.randint(0, 2)
     env = kaggle_environments.make(
-        "rps", configuration={"episodeSteps": 100}, debug=True)
-    outcomes = env.run([agent_to_eval, agent_to_eval])
+        "rps", configuration={"episodeSteps": 1000}, debug=True)
+    outcomes = env.run([agent_to_eval, trivial_opponent])
 
-  elif args.dojo == 'all':
-    agents = [
-        os.path.join('opponents', agent_file)
-        for agent_file in os.listdir('opponents')
-        if os.path.splitext(agent_file)[-1] == '.py']
-    df = eval_agent_against_baselines(agent_to_eval, agents)
   else:
-    raise NotImplementedError(f'Wtf is {args.dojo}?')
+    agent_to_eval = generate_kumoko_file(
+        ensemble=args.ensemble,
+        scoring=args.scoring,
+        use_meta=args.use_meta,
+        fu_thresh=args.fu_thresh,
+        action_choice=args.action_choice)
+
+    # Form list of enemies
+    if args.dojo == 'test':
+      env = kaggle_environments.make(
+          "rps", configuration={"episodeSteps": 100}, debug=True)
+      outcomes = env.run([agent_to_eval, agent_to_eval])
+
+    elif args.dojo == 'all':
+      agents = [
+          os.path.join('opponents', agent_file)
+          for agent_file in os.listdir('opponents')
+          if os.path.splitext(agent_file)[-1] == '.py']
+      df = eval_agent_against_baselines(agent_to_eval, agents)
+
+    elif args.dojo == 'trivial':
+      agents = [
+          'opponents/pi.py',
+          'opponents/konami_code.py',
+      ]
+      df = eval_agent_against_baselines(
+          agent_to_eval, agents, num_episodes=3)
+
+    elif args.dojo == 'small':
+      agents = [
+          'opponents/centrifugal_bumblepuppy_1000.py',
+          'opponents/centrifugal_bumblepuppy_13.py',
+          'opponents/centrifugal_bumblepuppy_16h.py',
+          'opponents/centrifugal_bumblepuppy_4.py',
+          'opponents/centrifugal_bumblepuppy_5.py',
+          'opponents/dllu1.py',
+          'opponents/iocaine_powder.py',
+          'opponents/memory_patterns_v7.py',
+          'opponents/rps_meta_fix.py',
+          'opponents/testinonmo.py',
+      ]
+      df = eval_agent_against_baselines(agent_to_eval, agents)
+
+    elif args.dojo == 'kumo':
+      cfgs = [
+          {
+            'name': '5_strats_v1a',
+            'kwargs': {
+              'ensemble': '5_strats_v1a',
+              'scoring': 'std_dllu_v1',
+              'use_meta': True,
+              'fu_thresh': None,
+              'action_choice': 'best',
+            }
+          },
+      ]
+      agents = [
+          generate_kumoko_file(name=cfg['name'], **cfg['kwargs'])
+          for cfg in cfgs]
+      df = eval_agent_against_baselines(agent_to_eval, agents)
+
+    else:
+      raise NotImplementedError(f'Wtf is {args.dojo}?')

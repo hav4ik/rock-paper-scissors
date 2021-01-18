@@ -1,4 +1,5 @@
 import random
+from time import perf_counter
 from kumoko.kumoko_base import *
 from kumoko.kumoko_meta import *
 

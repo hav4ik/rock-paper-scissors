@@ -9,6 +9,8 @@ from kumoko.strategies.hps_dojo_agent import HPSDojoStrategy
 from kumoko.strategies.testing_pls_ignore import TestingPlsIgnoreStrategy
 from kumoko.strategies.memory_patterns_v7 import MemoryPatternsV7Strategy
 from kumoko.strategies.centrifugal_bumblepuppy import CentrifugalBumblepuppy16h
+from kumoko.strategies.anti_trivial import AntiTrivialStrategy
+from kumoko.strategies.testimono import TestimonoStrategy
 
 
 class Testing:
@@ -27,6 +29,7 @@ class Testing:
     strategies.extend(
         generate_meta_strategy_pair(
           CentrifugalBumblepuppy16h))
+
     do_rotations = [True for _ in strategies]
     return strategies, do_rotations
 
@@ -180,6 +183,13 @@ class FourStratsV2a:
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
@@ -221,6 +231,13 @@ class FourStratsV2b:
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
@@ -262,6 +279,13 @@ class FourStratsV2c:
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
@@ -296,6 +320,13 @@ class FourStratsV3a:
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
 
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
@@ -334,6 +365,12 @@ class FourStratsV3b:
     strategies.extend(
         generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
     do_rotations.extend([True, True])
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
 
     return strategies, do_rotations
 
@@ -383,6 +420,59 @@ class FiveStratsV1a:
     return strategies, do_rotations
 
 
+class FiveStratsV2b:
+  """
+  Contains 5 type of strategies:
+  - RFindWrapped (with 4 windows and 3 sources wrapped inside a Kumoko)
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+    limits=[50, 20, 10]
+    sources = ['his', 'our', 'dna']
+    strategies.extend(
+        generate_meta_strategy_pair(
+          WrappedRFindStrategy,
+          limits=limits,
+          sources=sources,
+          shenanigans=False))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
 ENSEMBLES = {
   # Basic ensembles
   'test': Testing,
@@ -398,5 +488,6 @@ ENSEMBLES = {
   '4_strats_v3b': FourStratsV3b,
 
   # Ensembles with 5 strategies
-  '5_strats_v1a': FiveStratsV1a
+  '5_strats_v1a': FiveStratsV1a,
+  '5_strats_v2b': FiveStratsV2b,
 }

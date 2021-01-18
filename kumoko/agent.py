@@ -17,7 +17,8 @@ class KumokoAgent:
                scoring=SCORINGS['std_dllu_v1'],
                use_meta=True,
                fuck_you_thresh=None,
-               action_choice='best'):
+               action_choice='best',
+               verbose=False):
     if use_meta:
       self.kumoko_agent = MetaKumoko(
           Kumoko,
