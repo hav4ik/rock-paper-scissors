@@ -375,6 +375,47 @@ class FourStratsV3b:
     return strategies, do_rotations
 
 
+class FourStratsV3c:
+  """
+  Contains 4 type of strategies:
+  - RFind (with 4 windows and 3 sources)
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
 class FiveStratsV1a:
   """
   Contains 5 type of strategies:
@@ -650,6 +691,7 @@ ENSEMBLES = {
   '4_strats_v2c': FourStratsV2c,
   '4_strats_v3a': FourStratsV3a,
   '4_strats_v3b': FourStratsV3b,
+  '4_strats_v3c': FourStratsV3c,
 
   # Ensembles with 5 strategies
   '5_strats_v1a': FiveStratsV1a,
