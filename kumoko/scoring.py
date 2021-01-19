@@ -91,18 +91,96 @@ def standard_dllu_factory(scoring_configs,
                  meta_scoring_config)
 
 
+class StaticWindow(BaseScoringOracle):
+  def __init__(self, window_sizes, meta_scoring_config):
+    super().__init__()
+    self.window_sizes = np.array(window_sizes)
+    self.num_strategies = -1
+    self.outcomes = None
+    self.step = 0
+    self.meta_scoring_func = get_dllu_scoring(*meta_scoring_config)
+
+  def set_num_strategies(self, n):
+    self.num_strategies = n
+    self.outcomes = np.zeros((1000, n))
+    self.scores = np.zeros((len(self.window_sizes), n))
+    self.meta_scores = np.zeros((len(self.window_sizes), ))
+
+  def compute_scores(self, proposed_moves, his_move):
+    """Calculate scores for each strategy
+    """
+    # Save outcomes in the memory and increase step counter
+    assert len(proposed_moves) == self.num_strategies
+    for pa, proposed_move in enumerate(proposed_moves):
+      if proposed_move == BEAT[his_move]:
+        self.outcomes[self.step, pa] = 1
+      elif proposed_move == CEDE[his_move]:
+        self.outcomes[self.step, pa] = -1
+      else:
+        self.outcomes[self.step, pa] = 0
+    self.step += 1
+
+    # Calculating the values of before/after windows
+    for ws, window_size in enumerate(self.window_sizes):
+      if window_size > self.step:
+        self.scores[ws, ...] = np.random.random_sample(
+            self.scores[ws, ...].shape)
+      else:
+        self.scores[ws, ...] = np.sum(
+            self.outcomes[
+              self.step - window_size:self.step], axis=0)
+    return self.scores
+
+  def compute_meta_scores(self, proposed_moves, his_move):
+    """Generates a meta scoring function
+    """
+    assert len(proposed_moves) == len(self.meta_scores)
+    assert len(proposed_moves) == len(self.window_sizes)
+    for sf in range(len(self.window_sizes)):
+      self.meta_scores[sf] = self.meta_scoring_func(
+          self.meta_scores[sf],
+          proposed_moves[sf], his_move)
+    return self.meta_scores
+
+  def get_initial_scores(self):
+    """Initial scores at step 0"""
+    assert self.scores.shape[0] == len(self.window_sizes)
+    assert self.scores.shape[1] == self.num_strategies
+    return self.scores
+
+  def get_initial_meta_scores(self):
+    """Initial meta-scores at step 0"""
+    assert len(self.meta_scores) == len(self.window_sizes)
+    return self.meta_scores
+
+
+def static_window_factory(window_sizes,
+                          meta_scoring_config):
+  return partial(StaticWindow,
+                 window_sizes,
+                 meta_scoring_config)
+
 
 SCORINGS = {
+  # DLLU-based scorings:
   'std_dllu_v1': standard_dllu_factory(
-    scoring_configs=[
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-        [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-        [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-        [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ],
-    meta_scoring_config=[
-        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-          0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
-    ]),
+      scoring_configs=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+          [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
+          [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
+      ],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
+      ]),
+
+  # Static window scoring:
+  'static_wnd_v1': static_window_factory(
+      window_sizes=[10, 20, 50],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
+      ]),
 }

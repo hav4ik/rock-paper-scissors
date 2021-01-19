@@ -189,8 +189,8 @@ if __name__ == '__main__':
           {
             'name': '4_strats_v1a',
             'kwargs': {
-              'ensemble': '4_strats_v1a',
-              'scoring': 'std_dllu_v1',
+              'ensemble_cls': '4_strats_v1a',
+              'scoring_cls': 'std_dllu_v1',
               'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
@@ -200,8 +200,8 @@ if __name__ == '__main__':
           {
             'name': '4_strats_v2b',
             'kwargs': {
-              'ensemble': '4_strats_v2b',
-              'scoring': 'std_dllu_v1',
+              'ensemble_cls': '4_strats_v2b',
+              'scoring_cls': 'std_dllu_v1',
               'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
@@ -211,8 +211,38 @@ if __name__ == '__main__':
           {
             'name': '5_strats_v2b',
             'kwargs': {
-              'ensemble': '5_strats_v2b',
-              'scoring': 'std_dllu_v1',
+              'ensemble_cls': '5_strats_v2b',
+              'scoring_cls': 'std_dllu_v1',
+              'metameta_scoring': 'std_dllu_v1',
+              'use_meta': True,
+              'fu_thresh': None,
+              'action_choice': 'best',
+            }
+          },
+      ]
+      agents = [
+          generate_kumoko_file(name=cfg['name'], **cfg['kwargs'])
+          for cfg in cfgs]
+      df = eval_agent_against_baselines(agent_to_eval, agents)
+
+    elif args.dojo == 'cmp_score':
+      cfgs = [
+          {
+            'name': 'std_dllu_v1',
+            'kwargs': {
+              'ensemble_cls': 'rfind_v1',
+              'scoring_cls': 'std_dllu_v1',
+              'metameta_scoring': 'std_dllu_v1',
+              'use_meta': True,
+              'fu_thresh': None,
+              'action_choice': 'best',
+            }
+          },
+          {
+            'name': 'static_wnd_v1',
+            'kwargs': {
+              'ensemble_cls': 'rfind_v1',
+              'scoring_cls': 'static_wnd_v1',
               'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
