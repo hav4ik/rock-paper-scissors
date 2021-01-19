@@ -15,9 +15,10 @@ from kumoko.scoring import SCORINGS
 
 
 # Generate a full Kumoko agent file, with uuid
-def generate_kumoko_file(ensemble,
-                         scoring,
+def generate_kumoko_file(ensemble_cls,
+                         scoring_cls,
                          use_meta,
+                         metameta_scoring,
                          fu_thresh,
                          action_choice,
                          verbose=False,
@@ -35,9 +36,10 @@ from kumoko.scoring import SCORINGS
 
 global kumoko_agent
 kumoko_agent = KumokoAgent(
-      ensemble=ENSEMBLES['{ensemble}'],
-      scoring=SCORINGS['{scoring}'],
+      ensemble_cls=ENSEMBLES['{ensemble_cls}'],
+      scoring_cls=SCORINGS['{scoring_cls}'],
       use_meta={use_meta},
+      metameta_scoring='{metameta_scoring}',
       fuck_you_thresh={fu_thresh},
       action_choice='{action_choice}',
       verbose=True)
@@ -116,6 +118,7 @@ if __name__ == '__main__':
   kumoko_grp = parser.add_argument_group('kumoko args')
   kumoko_grp.add_argument('-e', '--ensemble', default='rfind_v1')
   kumoko_grp.add_argument('-s', '--scoring', default='std_dllu_v1')
+  kumoko_grp.add_argument('-w', '--metameta_scoring', default='std_dllu_v1')
   kumoko_grp.add_argument('-u', '--use_meta', action='store_true')
   kumoko_grp.add_argument('-f', '--fu_thresh', type=int, default=None)
   kumoko_grp.add_argument('-c', '--action_choice', default='best')
@@ -124,9 +127,10 @@ if __name__ == '__main__':
   # Agent to eval
   if args.dojo == 'perf':
     agent_to_eval = generate_kumoko_file(
-        ensemble=args.ensemble,
-        scoring=args.scoring,
+        ensemble_cls=args.ensemble,
+        scoring_cls=args.scoring,
         use_meta=args.use_meta,
+        metameta_scoring=args.metameta_scoring,
         fu_thresh=args.fu_thresh,
         action_choice=args.action_choice,
         verbose=True)
@@ -137,9 +141,10 @@ if __name__ == '__main__':
 
   else:
     agent_to_eval = generate_kumoko_file(
-        ensemble=args.ensemble,
-        scoring=args.scoring,
+        ensemble_cls=args.ensemble,
+        scoring_cls=args.scoring,
         use_meta=args.use_meta,
+        metameta_scoring=args.metameta_scoring,
         fu_thresh=args.fu_thresh,
         action_choice=args.action_choice)
 
@@ -186,6 +191,7 @@ if __name__ == '__main__':
             'kwargs': {
               'ensemble': '4_strats_v1a',
               'scoring': 'std_dllu_v1',
+              'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
               'action_choice': 'best',
@@ -196,6 +202,7 @@ if __name__ == '__main__':
             'kwargs': {
               'ensemble': '4_strats_v2b',
               'scoring': 'std_dllu_v1',
+              'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
               'action_choice': 'best',
@@ -206,6 +213,7 @@ if __name__ == '__main__':
             'kwargs': {
               'ensemble': '5_strats_v2b',
               'scoring': 'std_dllu_v1',
+              'metameta_scoring': 'std_dllu_v1',
               'use_meta': True,
               'fu_thresh': None,
               'action_choice': 'best',

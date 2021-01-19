@@ -2,6 +2,18 @@ import numpy as np
 from kumoko.kumoko_base import *
 
 
+METAMETA_SCORINGS = {
+    'std_dllu_v1': get_dllu_scoring(
+        decay=0.94,
+        win_value=3.0,
+        draw_value=0.0,
+        lose_value=-3.0,
+        drop_prob=0.87,
+        drop_draw=False,
+        clip_zero=True),
+}
+
+
 #----------------------------------------------------------
 #  GOING META WITH KUMOKO
 #----------------------------------------------------------
@@ -9,16 +21,13 @@ from kumoko.kumoko_base import *
 class MetaKumoko:
   def __init__(self,
                kumoko_cls,
-               metameta_scoring_func,
-               kumoko_args=[],
-               kumoko_kwargs={}):
-    self.kumoko_1 = kumoko_cls(
-        *kumoko_args, **kumoko_kwargs)
-    self.kumoko_2 = kumoko_cls(
-        *kumoko_args, **kumoko_kwargs)
+               metameta_scoring_func='std_dllu_v1'):
+    self.kumoko_1 = kumoko_cls()
+    self.kumoko_2 = kumoko_cls()
     self.proposed_actions = []
     self.scores = 3. * np.ones(shape=(6,))
-    self.scoring_func = metameta_scoring_func
+    self.scoring_func = \
+        METAMETA_SCORINGS[metameta_scoring_func]
     self.our_last_move = None
 
   def next_action(self, our_last_move, his_last_move):

@@ -1,96 +1,108 @@
 from kumoko.kumoko_base import *
+from abc import ABC, abstractmethod
+from functools import partial
 
 
-#----------------------------------------------------------
-#  DLLU SCORING FUNCTION FACTORY
-#----------------------------------------------------------
+class BaseScoringOracle:
+  @abstractmethod
+  def set_num_strategies(self, n):
+    raise NotImplemented
 
-def get_dllu_scoring(decay=1.,
-                     win_value=1.,
-                     draw_value=0.,
-                     lose_value=-1.,
-                     drop_prob=0.,
-                     drop_draw=False,
-                     clip_zero=False):
-  """Returns a DLLU score (daniel.lawrence.lu/programming/rps/)
+  @abstractmethod
+  def compute_scores(self, proposed_moves, his_move):
+    return NotImplemented
 
-  Adds 1 to previous score if we won, subtract if we lose the
-  round. Previous score is multiplied by a decay parameter >0.
-  Thus, if the opponent occasionally switches strategies, this
-  should be able to cope.
+  @abstractmethod
+  def compute_meta_scores(self, proposed_meta_moves, his_move):
+    return NotImplemented
 
-  If a predictor loses even once, its score is reset to zero
-  with some probability. This allows for much faster response
-  to opponents with switching strategies.
+  @abstractmethod
+  def compute_metameta_scores(self, proposed_metameta_moves, his_move):
+    return NotImplemented
+
+  @abstractmethod
+  def get_initial_scores(self):
+    return NotImplemented
+
+  @abstractmethod
+  def get_initial_meta_scores(self):
+    return NotImplemented
+
+
+class StandardDllu(BaseScoringOracle):
+  """DLLU scoring, as in the blog
   """
-  def _scoring_func(score, our_move, his_move):
-    if our_move == his_move:
-      retval = decay * score + draw_value
-    elif our_move == BEAT[his_move]:
-      retval = decay * score + win_value
-    elif our_move == CEDE[his_move]:
-      retval = decay * score + lose_value
+  def __init__(self, scoring_configs, meta_scoring_config):
+    super().__init__()
 
-    if drop_prob > 0. and random.random() < drop_prob:
-      if our_move == CEDE[his_move]:
-        score = 0.
-      elif drop_draw and our_move == his_move:
-        score = 0.
-
-    if clip_zero: retval = max(0., retval)
-    return retval
-
-  return _scoring_func
-
-
-class StandardDlluV1:
-  @staticmethod
-  def generate_normal():
-    """List of scoring functions
-    """
     # Add DLLU's scoring methods from his blog
     # https://daniel.lawrence.lu/programming/rps/
-    dllu_scoring_configs = [
+    self.scoring_funcs = [
+        get_dllu_scoring(*cfg) for cfg in scoring_configs]
+    self.meta_scoring_func = get_dllu_scoring(*meta_scoring_config)
+
+    self.num_strategies = -1
+    self.scores = None
+    self.meta_scores = None
+
+  def set_num_strategies(self, n):
+    self.num_strategies = n
+    self.scores = np.zeros((len(self.scoring_funcs), n))
+    self.meta_scores = np.zeros((len(self.scoring_funcs), ))
+
+  def compute_scores(self, proposed_moves, his_move):
+    """Calculate scores for each strategy
+    """
+    assert len(proposed_moves) == self.num_strategies
+    for sf in range(len(self.scoring_funcs)):
+      for pa in range(len(proposed_moves)):
+        self.scores[sf, pa] = self.scoring_funcs[sf](
+            self.scores[sf, pa],
+            proposed_moves[pa], his_move)
+    return self.scores
+
+  def compute_meta_scores(self, proposed_moves, his_move):
+    """Generates a meta scoring function
+    """
+    assert len(proposed_moves) == len(self.meta_scores)
+    assert len(proposed_moves) == len(self.scoring_funcs)
+    for sf in range(len(self.scoring_funcs)):
+      self.meta_scores[sf] = self.meta_scoring_func(
+          self.meta_scores[sf],
+          proposed_moves[sf], his_move)
+    return self.meta_scores
+
+  def get_initial_scores(self):
+    """Initial scores at step 0"""
+    assert self.scores.shape[0] == len(self.scoring_funcs)
+    assert self.scores.shape[1] == self.num_strategies
+    return self.scores
+
+  def get_initial_meta_scores(self):
+    """Initial meta-scores at step 0"""
+    assert len(self.meta_scores) == len(self.scoring_funcs)
+    return self.meta_scores
+
+
+def standard_dllu_factory(scoring_configs,
+                          meta_scoring_config):
+  return partial(StandardDllu,
+                 scoring_configs,
+                 meta_scoring_config)
+
+
+
+SCORINGS = {
+  'std_dllu_v1': standard_dllu_factory(
+    scoring_configs=[
         # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
         [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
         [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
         [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
         [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-    ]
-    scoring_funcs = [
-        get_dllu_scoring(*cfg)
-        for cfg in dllu_scoring_configs]
-    return scoring_funcs
-
-  @staticmethod
-  def get_meta_scoring():
-    """Generates a meta scoring function
-    """
-    meta_scoring_func = get_dllu_scoring(
-        decay=0.94,
-        win_value=3.0,
-        draw_value=0.0,
-        lose_value=-3.0,
-        drop_prob=0.87,
-        drop_draw=False,
-        clip_zero=True)
-    return meta_scoring_func
-
-  @staticmethod
-  def get_metameta_scoring():
-    """Generates a metameta scoring function
-    """
-    metameta_scoring_func = get_dllu_scoring(
-        decay=0.94,
-        win_value=3.0,
-        draw_value=0.0,
-        lose_value=-3.0,
-        drop_prob=0.87,
-        drop_draw=False,
-        clip_zero=True)
-    return metameta_scoring_func
-
-
-SCORINGS = {
-  'std_dllu_v1': StandardDlluV1,
+    ],
+    meta_scoring_config=[
+        # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+          0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
+    ]),
 }

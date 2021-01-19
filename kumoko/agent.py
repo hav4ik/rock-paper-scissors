@@ -1,6 +1,7 @@
 import os
 import random
 import kaggle_environments
+from functools import partial
 
 from kumoko.kumoko_base import *
 from kumoko.kumoko_meta import *
@@ -13,31 +14,28 @@ from kumoko.scoring import SCORINGS
 
 class KumokoAgent:
   def __init__(self,
-               ensemble=ENSEMBLES['rfind_v1'],
-               scoring=SCORINGS['std_dllu_v1'],
+               ensemble_cls=ENSEMBLES['rfind_v1'],
+               scoring_cls=SCORINGS['std_dllu_v1'],
                use_meta=True,
+               metameta_scoring='std_dllu_v1',
                fuck_you_thresh=None,
                action_choice='best',
                verbose=False):
+
+    kumoko_cls = partial(Kumoko,
+                         ensemble_cls=ensemble_cls,
+                         scoring_cls=scoring_cls,
+                         action_choice=action_choice)
     if use_meta:
       self.kumoko_agent = MetaKumoko(
-          Kumoko,
-          metameta_scoring_func=scoring.get_metameta_scoring(),
-          kumoko_kwargs={
-            'ensemble': ensemble,
-            'scoring': scoring,
-            'action_choice': action_choice,
-          })
+          kumoko_cls,
+          metameta_scoring_func=metameta_scoring)
     else:
-      self.kumoko_agent = Kumoko(
-          ensemble=ensemble,
-          scoring=scoring,
-          action_choice=action_choice)
+      self.kumoko_agent = kumoko_cls()
 
     self.latest_action = None
     self.current_score = 0
     self.fuck_you_thresh = fuck_you_thresh
-
 
   def __call__(self, obs, conf):
     if obs.step == 0:

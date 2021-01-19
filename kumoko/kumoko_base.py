@@ -94,3 +94,45 @@ def generate_meta_strategy_pair(atomic_strategy_cls,
 
   else:
     return [_actual_strategy]
+
+
+#----------------------------------------------------------
+#  DLLU SCORING FUNCTION FACTORY
+#----------------------------------------------------------
+
+def get_dllu_scoring(decay=1.,
+                     win_value=1.,
+                     draw_value=0.,
+                     lose_value=-1.,
+                     drop_prob=0.,
+                     drop_draw=False,
+                     clip_zero=False):
+  """Returns a DLLU score (daniel.lawrence.lu/programming/rps/)
+
+  Adds 1 to previous score if we won, subtract if we lose the
+  round. Previous score is multiplied by a decay parameter >0.
+  Thus, if the opponent occasionally switches strategies, this
+  should be able to cope.
+
+  If a predictor loses even once, its score is reset to zero
+  with some probability. This allows for much faster response
+  to opponents with switching strategies.
+  """
+  def _scoring_func(score, our_move, his_move):
+    if our_move == his_move:
+      retval = decay * score + draw_value
+    elif our_move == BEAT[his_move]:
+      retval = decay * score + win_value
+    elif our_move == CEDE[his_move]:
+      retval = decay * score + lose_value
+
+    if drop_prob > 0. and random.random() < drop_prob:
+      if our_move == CEDE[his_move]:
+        score = 0.
+      elif drop_draw and our_move == his_move:
+        score = 0.
+
+    if clip_zero: retval = max(0., retval)
+    return retval
+
+  return _scoring_func

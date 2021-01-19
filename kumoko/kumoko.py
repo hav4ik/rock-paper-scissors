@@ -5,7 +5,7 @@ from kumoko.kumoko_meta import *
 
 
 class Kumoko:
-  def __init__(self, ensemble, scoring, action_choice='best'):
+  def __init__(self, ensemble_cls, scoring_cls, action_choice='best'):
     """
     Arguments:
       ensemble: implementation of EnsembleBase interface
@@ -15,8 +15,8 @@ class Kumoko:
     self.proposed_meta_actions = []
     self.our_last_move = None
     self.holistic_history = HolisticHistoryHolder()
-    self.strategies, self.do_rotations = ensemble.generate()
-    self.scoring_funcs = scoring.generate_normal()
+    self.strategies, self.do_rotations = ensemble_cls().generate()
+    self.scoring = scoring_cls()
     self.action_choice = action_choice
 
     # Assert that all strats are unique objects
@@ -32,18 +32,15 @@ class Kumoko:
         self.n_strats_with_rots += 1
     self.n_all_strats = \
       len(self.strategies) + 2 * self.n_strats_with_rots
+    self.scoring.set_num_strategies(self.n_all_strats)
 
-    # Add initial scores for each strategy in the list
-    self.scores = 3. * np.ones(
-        shape=(len(self.scoring_funcs), self.n_all_strats))
+    # Add initial actions for each strategy in the list
+    self.scores = self.scoring.get_initial_scores()
     self.proposed_actions = [
       random.choice('RPS')] * self.scores.shape[1]
 
-    # Add meta-scores for each of the scoring function
-    self.meta_scoring_func = scoring.get_meta_scoring()
-
-    self.meta_scores = 3. * np.ones(
-        shape=(len(self.scoring_funcs)))
+    # Add initial meta-actions for each scoring
+    self.meta_scores = self.scoring.get_initial_meta_scores()
     self.proposed_meta_actions = [
         random.choice('RPS')] * self.meta_scores.shape[0]
 
@@ -66,28 +63,16 @@ class Kumoko:
     if his_last_move is not None and \
         len(self.proposed_actions) > 0:
 
-      if DEBUG_MODE:
-        assert len(self.proposed_actions) == \
-          self.n_all_strats
-        assert len(self.proposed_meta_actions) == \
-          len(self.meta_scores)
-        assert self.scores.shape[0] == \
-          len(self.scoring_funcs)
+      assert len(self.proposed_actions) == \
+        self.n_all_strats
 
       # Meta-strategy selection score
-      for sf in range(len(self.scoring_funcs)):
-        for pa in range(len(self.proposed_actions)):
-          self.scores[sf, pa] = self.scoring_funcs[sf](
-              self.scores[sf, pa],
-              self.proposed_actions[pa],
-              his_last_move)
+      self.scores[...] = self.scoring.compute_scores(
+          self.proposed_actions, his_last_move)
 
       # Selector selection score
-      for sf in range(len(self.scoring_funcs)):
-        self.meta_scores[sf] = self.meta_scoring_func(
-            self.meta_scores[sf],
-            self.proposed_meta_actions[sf],
-            his_last_move)
+      self.meta_scores[...] = self.scoring.compute_meta_scores(
+          self.proposed_meta_actions, his_last_move)
 
     # Generate next move for each strategy
     if len(self.proposed_actions) == 0:
@@ -114,14 +99,9 @@ class Kumoko:
 
     # For each scoring function (selector), choose the
     # action based on all of our policy actors
-
     if self.action_choice == 'best':
       # Simply choose the action with best score
       best_actions_idx = np.argmax(self.scores, axis=1)
-      if DEBUG_MODE:
-        assert best_actions_idx.shape == \
-          (len(self.scoring_funcs), )
-
       self.proposed_meta_actions = [
           self.proposed_actions[idx]
           for idx in best_actions_idx]

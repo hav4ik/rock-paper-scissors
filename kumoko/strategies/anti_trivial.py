@@ -1,6 +1,6 @@
 from kumoko.kumoko_base import *
 from kumoko.kumoko import Kumoko
-from kumoko.scoring import get_dllu_scoring
+from kumoko.scoring import SCORINGS
 import re
 
 
@@ -279,7 +279,6 @@ class AntiTrivialStrategy(BaseAtomicStrategy):
       """List of strategies (including mirror strategies)
       """
       strategies = []
-
       strategies.extend(
           generate_meta_strategy_pair(PiStrategy, mirroring=False))
       strategies.extend(
@@ -288,43 +287,11 @@ class AntiTrivialStrategy(BaseAtomicStrategy):
       do_rotations = [True for _ in strategies]
       return strategies, do_rotations
 
-  class _AntiTrivialInnerScoring:
-    """standard stuffs"""
-    def generate_normal(self):
-      """List of scoring functions
-      """
-      # Add DLLU's scoring methods from his blog
-      # https://daniel.lawrence.lu/programming/rps/
-      dllu_scoring_configs = [
-          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
-          [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
-          [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
-          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
-          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
-      ]
-      scoring_funcs = [
-          get_dllu_scoring(*cfg)
-          for cfg in dllu_scoring_configs]
-      return scoring_funcs
-
-    def get_meta_scoring(self):
-      """Generates a meta scoring function
-      """
-      meta_scoring_func = get_dllu_scoring(
-          decay=0.94,
-          win_value=3.0,
-          draw_value=0.0,
-          lose_value=-3.0,
-          drop_prob=0.87,
-          drop_draw=False,
-          clip_zero=True)
-      return meta_scoring_func
-
   def __init__(self):
     super().__init__()
-    ensemble = self._AntiTrivialInnerEnsemble()
-    scoring = self._AntiTrivialInnerScoring()
-    self.kumoko = Kumoko(ensemble=ensemble, scoring=scoring)
+    ensemble_cls = self._AntiTrivialInnerEnsemble
+    scoring_cls = SCORINGS['std_dllu_v1']
+    self.kumoko = Kumoko(ensemble_cls=ensemble_cls, scoring_cls=scoring_cls)
 
   def __call__(self, history):
     if len(history) > 0:

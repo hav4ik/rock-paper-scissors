@@ -17,7 +17,7 @@ class Testing:
   @staticmethod
   def generate():
     strategies = []
-    # limits = [10, 20]
+    limits = [10, 20]
     # for limit in limits:
     #   strategies.extend(
     #       generate_meta_strategy_pair(
@@ -26,11 +26,24 @@ class Testing:
     #         src='his',
     #         shenanigans=True,
     #       ))
+    sources = ['his', 'our', 'dna']
     strategies.extend(
         generate_meta_strategy_pair(
-          CentrifugalBumblepuppy16h))
-
+          WrappedRFindStrategy,
+          limits=limits,
+          sources=sources,
+          shenanigans=False))
+    # strategies.extend(
+    #     generate_meta_strategy_pair(
+    #       CentrifugalBumblepuppy16h))
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
