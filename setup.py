@@ -8,5 +8,6 @@ setup(name='kumoko',
       author='Chan Kha Vu',
       install_requires=[
         'kaggle-environments',
+        'pydash',
       ],
       packages=find_packages())

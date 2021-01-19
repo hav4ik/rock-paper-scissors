@@ -19,3 +19,106 @@ iocaine_powder                 ---  2/ 6/ 2 --- -3.0
 centrifugal_bumblepuppy_4      ---  8/ 2/ 0 --- 289.0
 memory_patterns_v7             ---  3/ 5/ 2 --- 42.0
 centrifugal_bumblepuppy_5      ---  5/ 5/ 0 --- 196.0
+
+
+
+Ensemble:   geom_v4
+scoring:    std_dllu_v1
+Use Meta:   False
+Rotate:     False
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+centrifugal_bumblepuppy_1000   ---  4/ 2/ 4 --- -18.0
+centrifugal_bumblepuppy_13     ---  6/ 2/ 2 --- 204.0
+centrifugal_bumblepuppy_16h    ---  2/ 3/ 5 --- -149.0
+centrifugal_bumblepuppy_4      ---  4/ 4/ 2 --- 8.0
+centrifugal_bumblepuppy_5      ---  1/ 9/ 0 --- 42.0
+dllu1                          ---  4/ 4/ 2 --- 83.0
+iocaine_powder                 ---  1/ 6/ 3 --- -92.0
+memory_patterns_v7             ---  3/ 7/ 0 --- 96.0
+rps_meta_fix                   ---  0/ 7/ 3 --- -70.0
+testinonmo                     ---  3/ 4/ 3 --- -96.0
+
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+memory_patterns_v7             ---  4/ 3/ 3 --- 0.0
+iocaine_powder                 ---  0/ 6/ 4 --- -144.0
+dllu1                          ---  1/ 5/ 4 --- -93.0
+centrifugal_bumblepuppy_1000   ---  2/ 6/ 2 --- -68.0
+centrifugal_bumblepuppy_4      ---  2/ 5/ 3 --- -42.0
+centrifugal_bumblepuppy_5      ---  4/ 4/ 2 --- 27.0
+centrifugal_bumblepuppy_13     ---  2/ 4/ 4 --- -112.0
+centrifugal_bumblepuppy_16h    ---  2/ 5/ 3 --- 0.0
+testinonmo                     ---  6/ 3/ 1 --- 138.0
+rps_meta_fix                   ---  2/ 8/ 0 --- 66.0
+
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+memory_patterns_v7             ---  3/ 3/ 4 --- -33.0
+dllu1                          ---  4/ 3/ 3 --- 67.0
+iocaine_powder                 ---  0/ 8/ 2 --- -62.0
+centrifugal_bumblepuppy_1000   ---  1/ 6/ 3 --- -69.0
+centrifugal_bumblepuppy_5      ---  3/ 5/ 2 --- 40.0
+centrifugal_bumblepuppy_4      ---  3/ 6/ 1 --- 49.0
+centrifugal_bumblepuppy_13     ---  3/ 5/ 2 --- 59.0
+centrifugal_bumblepuppy_16h    ---  2/ 7/ 1 --- -5.0
+testinonmo                     ---  1/ 5/ 4 --- -80.0
+rps_meta_fix                   ---  0/ 9/ 1 --- -47.0
+
+
+
+
+Ensemble:   stat_pred
+scoring:    std_dllu_v1
+Use Meta:   False
+Rotate:     False
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+memory_patterns_v7             ---  4/ 3/ 3 --- 46.0
+iocaine_powder                 ---  5/ 2/ 3 --- 105.0
+dllu1                          ---  2/ 7/ 1 --- 27.0
+centrifugal_bumblepuppy_1000   ---  3/ 7/ 0 --- 140.0
+centrifugal_bumblepuppy_5      ---  5/ 4/ 1 --- 99.0
+centrifugal_bumblepuppy_4      ---  1/ 7/ 2 --- -72.0
+centrifugal_bumblepuppy_13     ---  3/ 1/ 6 --- -42.0
+centrifugal_bumblepuppy_16h    ---  2/ 6/ 2 --- -85.0
+rps_meta_fix                   ---  3/ 6/ 1 --- 68.0
+testinonmo                     ---  2/ 5/ 3 --- -12.0
+
+
+
+Ensemble:   geom_v4_aug
+scoring:    std_dllu_v1
+Use Meta:   True
+Rotate:     True
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+memory_patterns_v7             ---  3/ 4/ 3 --- -8.0
+dllu1                          ---  3/ 4/ 3 --- 9.0
+iocaine_powder                 ---  3/ 5/ 2 --- 29.0
+centrifugal_bumblepuppy_1000   ---  2/ 4/ 4 --- -113.0
+centrifugal_bumblepuppy_4      ---  0/ 7/ 3 --- -108.0
+centrifugal_bumblepuppy_5      ---  2/ 4/ 4 --- -66.0
+centrifugal_bumblepuppy_16h    ---  2/ 5/ 3 --- 10.0
+centrifugal_bumblepuppy_13     ---  2/ 5/ 3 --- -34.0
+testinonmo                     ---  3/ 7/ 0 --- 151.0
+rps_meta_fix                   ---  5/ 3/ 2 --- 124.0
+
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+memory_patterns_v7             ---  2/ 7/ 1 --- 14.0
+dllu1                          ---  3/ 5/ 2 --- 65.0
+iocaine_powder                 ---  2/ 4/ 4 --- -52.0
+centrifugal_bumblepuppy_1000   ---  3/ 6/ 1 --- 94.0
+centrifugal_bumblepuppy_5      ---  2/ 6/ 2 --- 21.0
+centrifugal_bumblepuppy_4      ---  1/ 9/ 0 --- 36.0
+centrifugal_bumblepuppy_16h    ---  1/ 5/ 4 --- -145.0
+centrifugal_bumblepuppy_13     ---  3/ 6/ 1 --- 93.0
+testinonmo                     ---  0/ 6/ 4 --- -127.0
+rps_meta_fix                   ---  3/ 5/ 2 --- 17.0

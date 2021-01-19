@@ -11,6 +11,8 @@ from kumoko.strategies.memory_patterns_v7 import MemoryPatternsV7Strategy
 from kumoko.strategies.centrifugal_bumblepuppy import CentrifugalBumblepuppy16h
 from kumoko.strategies.anti_trivial import AntiTrivialStrategy
 from kumoko.strategies.testimono import TestimonoStrategy
+from kumoko.strategies.statistical_prediction import StatisticalPredictionStrategy
+from kumoko.strategies.geometry import GeometryV4Strategy
 
 
 class Testing:
@@ -68,6 +70,52 @@ class RFindOnlyV1:
               src=source,
               shenanigans=True,
             ))
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
+class StatisticalPrediction:
+  """Only Stat Prediction, nothing else!
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+    strategies.extend(
+        generate_meta_strategy_pair(
+          StatisticalPredictionStrategy))
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
+class GeometryV4:
+  """Only Geometry, nothing else!
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+    strategies.extend(
+        generate_meta_strategy_pair(
+          GeometryV4Strategy, mirroring=False))
+    do_rotations = [False for _ in strategies]
+    assert len(strategies) == 1
+    return strategies, do_rotations
+
+
+class GeometryV4Augmented:
+  """Only Geometry, nothing else!
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+    strategies.extend(
+        generate_meta_strategy_pair(
+          GeometryV4Strategy))
     do_rotations = [True for _ in strategies]
     return strategies, do_rotations
 
@@ -633,6 +681,55 @@ class FiveStratsV2d:
     return strategies, do_rotations
 
 
+class FiveStratsV3a:
+  """
+  Contains 5 type of strategies:
+  - RFind (with 4 windows and 3 sources)
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - RPS Geometry V4
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+    limits=[50, 20, 10]
+    sources = ['his', 'our', 'dna']
+    for limit in limits:
+      for source in sources:
+        strategies.extend(
+            generate_meta_strategy_pair(
+              RFindStrategy,
+              limit=limit,
+              src=source,
+              shenanigans=False,
+            ))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(
+          GeometryV4Strategy))
+
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
 class SixStratsV1a:
   """
   Contains 6 type of strategies:
@@ -692,9 +789,12 @@ class SixStratsV1a:
 
 
 ENSEMBLES = {
-  # Basic ensembles
+  # Basic ensembles and single agents
   'test': Testing,
   'rfind_v1': RFindOnlyV1,
+  'stat_pred': StatisticalPrediction,
+  'geom_v4': GeometryV4,
+  'geom_v4_aug': GeometryV4Augmented,
 
   # Ensembles with 4 strategies
   '4_strats_v1': FourStratsV1,
@@ -710,6 +810,7 @@ ENSEMBLES = {
   '5_strats_v1a': FiveStratsV1a,
   '5_strats_v2b': FiveStratsV2b,
   '5_strats_v2c': FiveStratsV2c,
+  '5_strats_v3a': FiveStratsV3a,
 
   # Ensembles with 6 strategies
   '6_strats_v1a': SixStratsV1a,

@@ -169,6 +169,20 @@ if __name__ == '__main__':
       df = eval_agent_against_baselines(
           agent_to_eval, agents, num_episodes=3)
 
+    elif args.dojo == 'tiny':
+      agents = [
+          'opponents/centrifugal_bumblepuppy_13.py',
+          'opponents/centrifugal_bumblepuppy_16h.py',
+          'opponents/dllu1.py',
+          'opponents/iocaine_powder.py',
+          'opponents/memory_patterns_v7.py',
+          'opponents/rps_meta_fix.py',
+          'opponents/testinonmo.py',
+          'opponents/statistical_prediction.py',
+          'opponents/geometry.py',
+      ]
+      df = eval_agent_against_baselines(agent_to_eval, agents)
+
     elif args.dojo == 'small':
       agents = [
           'opponents/centrifugal_bumblepuppy_1000.py',
@@ -181,6 +195,8 @@ if __name__ == '__main__':
           'opponents/memory_patterns_v7.py',
           'opponents/rps_meta_fix.py',
           'opponents/testinonmo.py',
+          'opponents/statistical_prediction.py',
+          'opponents/geometry.py',
       ]
       df = eval_agent_against_baselines(agent_to_eval, agents)
 
