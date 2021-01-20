@@ -1,0 +1,8 @@
+- name: 4_strats_v1a
+  kwargs:
+    ensemble_cls: 4_strats_v1a
+    scoring_cls: std_dllu_v1
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: best

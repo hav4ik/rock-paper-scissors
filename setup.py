@@ -9,5 +9,6 @@ setup(name='kumoko',
       install_requires=[
         'kaggle-environments',
         'pydash',
+        'pyyaml',
       ],
       packages=find_packages())

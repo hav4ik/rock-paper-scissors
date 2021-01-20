@@ -7,6 +7,7 @@ from functools import partial
 
 class RFindStrategy(BaseAtomicStrategy):
   def __init__(self, limit=None, src='his', shenanigans=True):
+    super().__init__()
     self.limit = limit
     self.src = src
     self.shenanigans = shenanigans

@@ -1,5 +1,6 @@
 import os
 import uuid
+import yaml
 from argparse import ArgumentParser
 
 import pandas as pd
@@ -126,27 +127,34 @@ if __name__ == '__main__':
 
   # Agent to eval
   if args.dojo == 'perf':
-    agent_to_eval = generate_kumoko_file(
-        ensemble_cls=args.ensemble,
-        scoring_cls=args.scoring,
-        use_meta=args.use_meta,
-        metameta_scoring=args.metameta_scoring,
-        fu_thresh=args.fu_thresh,
-        action_choice=args.action_choice,
-        verbose=True)
+    if os.path.exists(args.ensemble):
+      agent_to_eval = args.ensemble
+    else:
+      agent_to_eval = generate_kumoko_file(
+          ensemble_cls=args.ensemble,
+          scoring_cls=args.scoring,
+          use_meta=args.use_meta,
+          metameta_scoring=args.metameta_scoring,
+          fu_thresh=args.fu_thresh,
+          action_choice=args.action_choice,
+          verbose=True)
     trivial_opponent = lambda obs, cfg: random.randint(0, 2)
     env = kaggle_environments.make(
         "rps", configuration={"episodeSteps": 1000}, debug=True)
     outcomes = env.run([agent_to_eval, trivial_opponent])
 
   else:
-    agent_to_eval = generate_kumoko_file(
-        ensemble_cls=args.ensemble,
-        scoring_cls=args.scoring,
-        use_meta=args.use_meta,
-        metameta_scoring=args.metameta_scoring,
-        fu_thresh=args.fu_thresh,
-        action_choice=args.action_choice)
+    if os.path.exists(args.ensemble):
+      agent_to_eval = args.ensemble
+    else:
+      agent_to_eval = generate_kumoko_file(
+          ensemble_cls=args.ensemble,
+          scoring_cls=args.scoring,
+          use_meta=args.use_meta,
+          metameta_scoring=args.metameta_scoring,
+          fu_thresh=args.fu_thresh,
+          action_choice=args.action_choice,
+          verbose=False)
 
     # Form list of enemies
     if args.dojo == 'test':
@@ -154,7 +162,7 @@ if __name__ == '__main__':
           "rps", configuration={"episodeSteps": 100}, debug=True)
       outcomes = env.run([agent_to_eval, agent_to_eval])
 
-    elif args.dojo == 'all':
+    elif args.dojo == 'full':
       agents = [
           os.path.join('opponents', agent_file)
           for agent_file in os.listdir('opponents')
@@ -272,4 +280,19 @@ if __name__ == '__main__':
       df = eval_agent_against_baselines(agent_to_eval, agents)
 
     else:
-      raise NotImplementedError(f'Wtf is {args.dojo}?')
+      # Reading from custom YAML file
+      if not os.path.exists(args.dojo):
+        raise FileNotFoundError('enemies.yaml not found.')
+      with open(args.dojo, 'r') as f:
+        enemy_list = yaml.safe_load(f)
+
+      agents = []
+      for enemy in enemy_list:
+        if isinstance(enemy, str):
+          agents.append(enemy)
+        elif isinstance(enemy, dict):
+          agents.append(
+              generate_kumoko_file(name=enemy['name'], **enemy['kwargs']))
+        else:
+          raise ValueError('enemy should be a path to file or kumoko config')
+      df = eval_agent_against_baselines(agent_to_eval, agents)
