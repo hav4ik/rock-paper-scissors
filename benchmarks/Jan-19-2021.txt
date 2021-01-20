@@ -1,0 +1,15 @@
+ensemble: 7_strats_v1a
+use_meta: false
+a_choice: best
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+centrifugal_bumblepuppy_13     ---  2/ 7/ 1 --- 40.0
+centrifugal_bumblepuppy_16h    --- 10/ 0/ 0 --- 6542.0
+dllu1                          ---  9/ 1/ 0 --- 434.0
+iocaine_powder                 ---  5/ 5/ 0 --- 180.0
+memory_patterns_v7             ---  3/ 6/ 1 --- 94.0
+rps_meta_fix                   ---  1/ 8/ 1 --- -22.0
+testinonmo                     --- 10/ 0/ 0 --- 4813.0
+statistical_prediction         --- 10/ 0/ 0 --- 10.0
+geometry                       ---  2/ 5/ 3 --- -19.0

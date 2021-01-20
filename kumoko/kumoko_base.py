@@ -26,6 +26,9 @@ DNA_ENCODE = {
 #  MAIN CLASSES AND METHODS
 #----------------------------------------------------------
 
+AtomicStrategy = collections.namedtuple(
+    'AtomicStrategy', 'name next_action')
+
 class HistoryHolder:
   """Holds the sequence of moves since the start of the game"""
   def __init__(self):
@@ -69,6 +72,9 @@ class BaseAtomicStrategy(ABC):
     """Returns an action to take, given the game history"""
     pass
 
+  def name(self):
+    return type(self).__name__
+
 
 def shift_action(action, shift):
   shift = shift % 3
@@ -87,13 +93,25 @@ def generate_meta_strategy_pair(atomic_strategy_cls,
 
   if mirroring:
     mirror_atomic = atomic_strategy_cls(*args, **kwargs)
+
     def _mirror_strategy(holistic_history):
       move = mirror_atomic(holistic_history.mirror_history)
       return BEAT[move]
-    return _actual_strategy, _mirror_strategy
 
+    return [
+        AtomicStrategy(
+          f'{actual_atomic.name()}',
+          _actual_strategy),
+        AtomicStrategy(
+          f'{mirror_atomic.name()}_mirror',
+          _mirror_strategy)
+        ]
   else:
-    return [_actual_strategy]
+    return [
+        AtomicStrategy(
+          f'{actual_atomic.name()}',
+          _actual_strategy),
+        ]
 
 
 #----------------------------------------------------------

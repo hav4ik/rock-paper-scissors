@@ -36,6 +36,7 @@ class KumokoAgent:
     self.latest_action = None
     self.current_score = 0
     self.fuck_you_thresh = fuck_you_thresh
+    self.verbose = verbose
 
   def __call__(self, obs, conf):
     if obs.step == 0:
@@ -50,7 +51,7 @@ class KumokoAgent:
         self.current_score += 1
 
       s_move = self.kumoko_agent.next_action(
-          s_our_last_move, s_his_last_move)
+          s_our_last_move, s_his_last_move, self.verbose)
 
     self.latest_action = MOVE_TO_NUM[s_move]
 

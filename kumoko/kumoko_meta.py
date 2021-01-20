@@ -30,7 +30,7 @@ class MetaKumoko:
         METAMETA_SCORINGS[metameta_scoring_func]
     self.our_last_move = None
 
-  def next_action(self, our_last_move, his_last_move):
+  def next_action(self, our_last_move, his_last_move, verbose=False):
     """Generate next move based on opponent's last move"""
 
     # Force last move, so that we can use Kumoko as part of
@@ -48,8 +48,10 @@ class MetaKumoko:
 
     # Generate actions for Kumoko in our shoes and in the
     # shoes of opponents (i.e. 6 meta-strategies)
-    a1 = self.kumoko_1.next_action(our_last_move, his_last_move)
-    a2 = self.kumoko_2.next_action(his_last_move, our_last_move)
+    a1 = self.kumoko_1.next_action(
+        our_last_move, his_last_move, verbose, 'actual_')
+    a2 = self.kumoko_2.next_action(
+        his_last_move, our_last_move, verbose, 'mirror_')
     a2 = BEAT[a2]
     self.proposed_actions = [
         a1, a2, BEAT[a1], BEAT[a2], CEDE[a1], CEDE[a2]]

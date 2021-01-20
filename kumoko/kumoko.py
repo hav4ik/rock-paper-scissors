@@ -5,7 +5,10 @@ from kumoko.kumoko_meta import *
 
 
 class Kumoko:
-  def __init__(self, ensemble_cls, scoring_cls, action_choice='best'):
+  def __init__(self,
+               ensemble_cls,
+               scoring_cls,
+               action_choice='best'):
     """
     Arguments:
       ensemble: implementation of EnsembleBase interface
@@ -22,7 +25,7 @@ class Kumoko:
     # Assert that all strats are unique objects
     strat_ids = set()
     for strategy in self.strategies:
-      strat_ids.add(id(strategy))
+      strat_ids.add(id(strategy.next_action))
     assert len(strat_ids) == len(self.strategies)
 
     # Count strategies with rotation
@@ -39,12 +42,29 @@ class Kumoko:
     self.proposed_actions = [
       random.choice('RPS')] * self.scores.shape[1]
 
+    # Get the names for each strategy
+    self.strategy_names = [
+        strategy.name for strategy in self.strategies]
+    for st, do_rotation in enumerate(self.do_rotations):
+      if do_rotation is True:
+        self.strategy_names.append(
+            self.strategies[st].name + '^1')
+    for st, do_rotation in enumerate(self.do_rotations):
+      if do_rotation is True:
+        self.strategy_names.append(
+            self.strategies[st].name + '^2')
+    assert len(self.strategy_names) == len(self.proposed_actions)
+
     # Add initial meta-actions for each scoring
     self.meta_scores = self.scoring.get_initial_meta_scores()
     self.proposed_meta_actions = [
         random.choice('RPS')] * self.meta_scores.shape[0]
 
-  def next_action(self, our_last_move, his_last_move):
+  def next_action(self,
+                  our_last_move,
+                  his_last_move,
+                  verbose=False,
+                  prefix=''):
     """Generate next move based on opponent's last move"""
 
     # Force last move, so that we can use Kumoko as part of
@@ -58,6 +78,10 @@ class Kumoko:
         assert self.our_last_move is not None
       self.holistic_history.add_moves(
           self.our_last_move, his_last_move)
+
+    # If verbose, we output a YAML at each step for debugging
+    if verbose:
+      print(f'step: {len(self.holistic_history)}')
 
     # Update score for the previous game step
     if his_last_move is not None and \
@@ -81,20 +105,28 @@ class Kumoko:
     else:
       strats_with_rots_counter = 0
       for st in range(len(self.strategies)):
+        # Proposed actions for each strategy
         proposed_action = \
-          self.strategies[st](self.holistic_history)
+          self.strategies[st].next_action(self.holistic_history)
+
         if proposed_action is not None:
+          # Rotation = 0
           self.proposed_actions[st] = proposed_action
+
+          # Generate rotations
           if self.do_rotations[st]:
+            # Rotation = 1
             self.proposed_actions[
                 strats_with_rots_counter + \
                 len(self.strategies)] = \
               BEAT[self.proposed_actions[st]]
+            # Rotation = 2
             self.proposed_actions[
                 strats_with_rots_counter + \
                 self.n_strats_with_rots + \
                 len(self.strategies)] = \
               CEDE[self.proposed_actions[st]]
+            # Index shift counter
             strats_with_rots_counter += 1
 
     # For each scoring function (selector), choose the
@@ -133,5 +165,21 @@ class Kumoko:
     best_meta_action_idx = np.argmax(self.meta_scores)
     self.our_last_move = \
       self.proposed_meta_actions[best_meta_action_idx]
+
+    if verbose:
+      print(prefix + 'proposed:')
+      score_names = self.scoring.get_score_names()
+      for sf in np.argsort(self.meta_scores)[::-1]:
+        print(f'  - {self.proposed_meta_actions[sf]} ' \
+                  f'({self.meta_scores[sf]:.2f}) ' \
+                  f'{score_names[sf]}:')
+        best_args = np.argsort(self.scores[sf])[::-1][:7]
+        for idx in best_args:
+          print(f'    - {self.proposed_actions[idx]} ' \
+                      f'({self.scores[sf, idx]:.2f}) ' \
+                      f'{self.strategy_names[idx]}')
+
+      print(prefix + f'chosen_scoring: {score_names[best_meta_action_idx]}')
+      print(prefix + f'chosen_action: {self.our_last_move}')
 
     return self.our_last_move

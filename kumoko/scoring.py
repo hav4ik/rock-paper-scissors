@@ -28,6 +28,10 @@ class BaseScoringOracle:
   def get_initial_meta_scores(self):
     return NotImplemented
 
+  @abstractmethod
+  def get_score_names(self):
+    return NotImplemented
+
 
 class StandardDllu(BaseScoringOracle):
   """DLLU scoring, as in the blog
@@ -82,6 +86,11 @@ class StandardDllu(BaseScoringOracle):
     """Initial meta-scores at step 0"""
     assert len(self.meta_scores) == len(self.scoring_funcs)
     return self.meta_scores
+
+  def get_score_names(self):
+    return [
+        f'std_dllu_{i}'
+        for i in range(len(self.scoring_funcs))]
 
 
 def standard_dllu_factory(scoring_configs,
@@ -152,6 +161,9 @@ class StaticWindow(BaseScoringOracle):
     """Initial meta-scores at step 0"""
     assert len(self.meta_scores) == len(self.window_sizes)
     return self.meta_scores
+
+  def get_score_names(self):
+    return [f'static_wnd_{ws}' for ws in self.window_sizes]
 
 
 def static_window_factory(window_sizes,

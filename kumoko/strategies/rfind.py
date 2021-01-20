@@ -11,6 +11,12 @@ class RFindStrategy(BaseAtomicStrategy):
     self.src = src
     self.shenanigans = shenanigans
 
+  def name(self):
+    name = f'RFind_{self.limit}_{self.src}'
+    if self.shenanigans:
+      name += '_with_shen'
+    return name
+
   def __call__(self, history):
     if len(history) == 0:
       return NUM_TO_MOVE[random.randint(0, 2)]
