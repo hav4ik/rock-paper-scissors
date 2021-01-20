@@ -727,6 +727,13 @@ class FiveStratsV3a:
           GeometryV4Strategy))
 
     do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
     return strategies, do_rotations
 
 
@@ -788,6 +795,62 @@ class SixStratsV1a:
     return strategies, do_rotations
 
 
+class SevenStratsV1a:
+  """
+  Contains 6 type of strategies:
+  - RFindWrapped (with 4 windows and 3 sources wrapped inside a Kumoko)
+  - DecisionTree
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - Memory Patterns V7
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
 ENSEMBLES = {
   # Basic ensembles and single agents
   'test': Testing,
@@ -814,4 +877,7 @@ ENSEMBLES = {
 
   # Ensembles with 6 strategies
   '6_strats_v1a': SixStratsV1a,
+
+  # Ensembles with 7 strategies
+  '7_strats_v1a': SevenStratsV1a,
 }
