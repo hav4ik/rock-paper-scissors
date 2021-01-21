@@ -172,6 +172,23 @@ class Kumoko:
           NUM_TO_MOVE[voted_a]
           for voted_a in np.argmax(action_cum_scores, axis=1)]
 
+    elif self.action_choice == 'vote10':
+      # Vote by summing the score for each action
+      action_cum_scores = np.zeros(
+          shape=(self.scores.shape[0], 3))
+
+      for sf in range(self.scores.shape[0]):
+        for pa in np.argsort(self.scores[sf])[::-1][:10]:
+          if self.scores[sf, pa] <= 0.0:
+            break
+          action = self.proposed_actions[pa]
+          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
+              self.scores[sf, pa]
+
+      self.proposed_meta_actions = [
+          NUM_TO_MOVE[voted_a]
+          for voted_a in np.argmax(action_cum_scores, axis=1)]
+
     else:
       # Not implemented
       raise NotImplementedError(

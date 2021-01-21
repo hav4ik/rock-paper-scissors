@@ -982,6 +982,77 @@ class EightStratsV1a:
     return strategies, do_rotations
 
 
+class EightStratsV1b:
+  """
+  Contains 8 type of strategies:
+  - RFind family (with 3 limits and 3 sources)
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+    limits=[50, 20, 10]
+    sources = ['his', 'our', 'dna']
+    for limit in limits:
+      for source in sources:
+        strategies.extend(
+            generate_meta_strategy_pair(
+              RFindStrategy,
+              limit=limit,
+              src=source,
+              shenanigans=False,
+            ))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
 ENSEMBLES = {
   # Basic ensembles and single agents
   'test': Testing,
@@ -1015,4 +1086,5 @@ ENSEMBLES = {
 
   # Ensembles with 8 strategies
   '8_strats_v1a': EightStratsV1a,
+  '8_strats_v1b': EightStratsV1b,
 }
