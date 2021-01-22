@@ -103,7 +103,8 @@ class GeometryV4:
     strategies = []
     strategies.extend(
         generate_meta_strategy_pair(
-          GeometryV4Strategy, mirroring=False))
+          GeometryV4Strategy, mirroring=False,
+          alpha=0.5))
     do_rotations = [False for _ in strategies]
     assert len(strategies) == 1
     return strategies, do_rotations
@@ -119,7 +120,8 @@ class GeometryV4Augmented:
     strategies = []
     strategies.extend(
         generate_meta_strategy_pair(
-          GeometryV4Strategy))
+          GeometryV4Strategy,
+          alpha=0.1))
     do_rotations = [True for _ in strategies]
     return strategies, do_rotations
 

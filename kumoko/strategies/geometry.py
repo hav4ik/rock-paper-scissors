@@ -138,7 +138,7 @@ class BaseAgent:
             self.step = len(external_history)
 
             opp = int(MOVE_TO_NUM[external_history.his_moves[-1]])
-            my = self.my_hist[-1]
+            my = int(MOVE_TO_NUM[external_history.our_moves[-1]])
 
             self.my_opp_hist.append((my, opp))
             self.opp_hist.append(opp)
@@ -192,9 +192,9 @@ class Agent(BaseAgent):
     
     
 class GeometryV4Strategy(BaseAtomicStrategy):
-  def __init__(self):
+  def __init__(self, alpha=0.01,):
     super().__init__()
-    self.agent = Agent()
+    self.agent = Agent(alpha=alpha)
 
   def __call__(self, history):
     return NUM_TO_MOVE[self.agent(history)]
