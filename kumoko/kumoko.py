@@ -137,6 +137,11 @@ class Kumoko:
       self.proposed_meta_actions = [
           self.proposed_actions[idx]
           for idx in best_actions_idx]
+      assert len(best_actions_idx) == self.scores.shape[0]
+      assert len(self.proposed_meta_actions) == self.scores.shape[0]
+      for sf in range(self.scores.shape[0]):
+        if self.scores[sf, best_actions_idx[sf]] < 1e-5:
+          self.proposed_meta_actions[sf] = random.choice('RPS')
 
     elif self.action_choice == 'vote':
       # Vote by summing the score for each action

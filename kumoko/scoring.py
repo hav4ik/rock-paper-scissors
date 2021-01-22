@@ -101,13 +101,14 @@ def standard_dllu_factory(scoring_configs,
 
 
 class StaticWindow(BaseScoringOracle):
-  def __init__(self, window_sizes, meta_scoring_config):
+  def __init__(self, window_sizes, meta_scoring_config, safeguard=None):
     super().__init__()
     self.window_sizes = np.array(window_sizes)
     self.num_strategies = -1
     self.outcomes = None
     self.step = 0
     self.meta_scoring_func = get_dllu_scoring(*meta_scoring_config)
+    self.safeguard = safeguard
 
   def set_num_strategies(self, n):
     self.num_strategies = n
@@ -138,6 +139,8 @@ class StaticWindow(BaseScoringOracle):
         self.scores[ws, ...] = np.sum(
             self.outcomes[
               self.step - window_size:self.step], axis=0)
+        if self.safeguard is not None:
+          self.scores[ws][self.scores[ws] < self.safeguard * window_size] = 0.
     return self.scores
 
   def compute_meta_scores(self, proposed_moves, his_move):
@@ -167,10 +170,12 @@ class StaticWindow(BaseScoringOracle):
 
 
 def static_window_factory(window_sizes,
-                          meta_scoring_config):
+                          meta_scoring_config,
+                          safeguard=None):
   return partial(StaticWindow,
                  window_sizes,
-                 meta_scoring_config)
+                 meta_scoring_config,
+                 safeguard)
 
 
 SCORINGS = {
@@ -195,4 +200,13 @@ SCORINGS = {
           # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
             0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
       ]),
+
+  # Static window scoring:
+  'static_wnd_v2': static_window_factory(
+      window_sizes=[10, 20, 50],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
+      ],
+      safeguard=0.25),
 }
