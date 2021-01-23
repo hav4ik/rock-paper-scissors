@@ -944,13 +944,13 @@ class EightStratsV1a:
     strategies.extend(
         generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
 
-    # # Add decision tree strategies
-    # strategies.extend(
-    #     generate_meta_strategy_pair(DecisionTreeStrategy))
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
 
-    # # Add decision tree strategies
-    # strategies.extend(
-    #     generate_meta_strategy_pair(DecisionTreeV10Strategy))
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
 
     # Add HPS Dojo strategies
     strategies.extend(
@@ -1015,13 +1015,93 @@ class EightStratsV1b:
               shenanigans=False,
             ))
 
-    # # Add decision tree strategies
-    # strategies.extend(
-    #     generate_meta_strategy_pair(DecisionTreeStrategy))
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
 
-    # # Add decision tree strategies
-    # strategies.extend(
-    #     generate_meta_strategy_pair(DecisionTreeV10Strategy))
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
+class NineStratsV1a:
+  """
+  Contains 9 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - RFind family (with 3 limits and 3 sources)
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add RFind strategies (2 meta-strategies P0 and P'0 for each)
+    limits=[50, 20, 10]
+    sources = ['his', 'our', 'dna']
+    for limit in limits:
+      for source in sources:
+        strategies.extend(
+            generate_meta_strategy_pair(
+              RFindStrategy,
+              limit=limit,
+              src=source,
+              shenanigans=False,
+            ))
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
 
     # Add HPS Dojo strategies
     strategies.extend(
@@ -1089,4 +1169,7 @@ ENSEMBLES = {
   # Ensembles with 8 strategies
   '8_strats_v1a': EightStratsV1a,
   '8_strats_v1b': EightStratsV1b,
+
+  # Ensembles with 9 strategies
+  '9_strats_v1a': NineStratsV1a,
 }
