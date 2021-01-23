@@ -944,13 +944,13 @@ class EightStratsV1a:
     strategies.extend(
         generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
 
-    # Add decision tree strategies
-    strategies.extend(
-        generate_meta_strategy_pair(DecisionTreeStrategy))
+    # # Add decision tree strategies
+    # strategies.extend(
+    #     generate_meta_strategy_pair(DecisionTreeStrategy))
 
-    # Add decision tree strategies
-    strategies.extend(
-        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+    # # Add decision tree strategies
+    # strategies.extend(
+    #     generate_meta_strategy_pair(DecisionTreeV10Strategy))
 
     # Add HPS Dojo strategies
     strategies.extend(
@@ -1015,13 +1015,13 @@ class EightStratsV1b:
               shenanigans=False,
             ))
 
-    # Add decision tree strategies
-    strategies.extend(
-        generate_meta_strategy_pair(DecisionTreeStrategy))
+    # # Add decision tree strategies
+    # strategies.extend(
+    #     generate_meta_strategy_pair(DecisionTreeStrategy))
 
-    # Add decision tree strategies
-    strategies.extend(
-        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+    # # Add decision tree strategies
+    # strategies.extend(
+    #     generate_meta_strategy_pair(DecisionTreeV10Strategy))
 
     # Add HPS Dojo strategies
     strategies.extend(

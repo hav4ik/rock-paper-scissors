@@ -1,0 +1,30 @@
+-e 8_strats_v1a -u -s std_dllu_v1
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+centrifugal_bumblepuppy_1000   ---  4/ 4/ 2 --- 56.0
+centrifugal_bumblepuppy_13     ---  1/ 4/ 5 --- -159.0
+centrifugal_bumblepuppy_16h    --- 10/ 0/ 0 --- 4433.0
+centrifugal_bumblepuppy_4      ---  3/ 6/ 1 --- 59.0
+centrifugal_bumblepuppy_5      ---  3/ 5/ 2 --- 42.0
+greenberg                      ---  3/ 5/ 2 --- 28.0
+dllu1                          ---  5/ 5/ 0 --- 178.0
+iocaine_powder                 ---  1/ 7/ 2 --- -50.0
+rps_meta_fix                   ---  2/ 7/ 1 --- 28.0
+testimono                      --- 10/ 0/ 0 --- 10.0
+
+
+-e 8_strats_v1a -u -s risk_mng_v1
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+centrifugal_bumblepuppy_1000   ---  4/ 5/ 1 --- 125.0
+centrifugal_bumblepuppy_13     ---  3/ 7/ 0 --- 89.0
+centrifugal_bumblepuppy_16h    --- 10/ 0/ 0 --- 5344.0
+centrifugal_bumblepuppy_4      ---  6/ 3/ 1 --- 224.0
+centrifugal_bumblepuppy_5      ---  4/ 5/ 1 --- 122.0
+greenberg                      ---  4/ 6/ 0 --- 108.0
+dllu1                          ---  2/ 7/ 1 --- 52.0
+iocaine_powder                 ---  1/ 7/ 2 --- -23.0
+rps_meta_fix                   ---  2/ 5/ 3 --- 3.0
+testimono                      --- 10/ 0/ 0 --- 10.0

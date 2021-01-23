@@ -160,7 +160,7 @@ if __name__ == '__main__':
     if args.dojo == 'test':
       env = kaggle_environments.make(
           "rps", configuration={"episodeSteps": 100}, debug=True)
-      outcomes = env.run([agent_to_eval, agent_to_eval])
+      outcomes = env.run([agent_to_eval, 'opponents/rps_meta_fix.py'])
 
     elif args.dojo == 'full':
       agents = [

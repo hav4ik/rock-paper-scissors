@@ -137,18 +137,18 @@ def get_dllu_scoring(decay=1.,
   to opponents with switching strategies.
   """
   def _scoring_func(score, our_move, his_move):
+    if drop_prob > 0. and random.random() < drop_prob:
+      if our_move == CEDE[his_move]:
+        score = 0.
+      elif drop_draw and our_move == his_move:
+        score = 0.
+
     if our_move == his_move:
       retval = decay * score + draw_value
     elif our_move == BEAT[his_move]:
       retval = decay * score + win_value
     elif our_move == CEDE[his_move]:
       retval = decay * score + lose_value
-
-    if drop_prob > 0. and random.random() < drop_prob:
-      if our_move == CEDE[his_move]:
-        score = 0.
-      elif drop_draw and our_move == his_move:
-        score = 0.
 
     if clip_zero: retval = max(0., retval)
     return retval

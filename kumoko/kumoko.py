@@ -60,13 +60,16 @@ class Kumoko:
     self.proposed_meta_actions = [
         random.choice('RPS')] * self.meta_scores.shape[0]
 
+    # Outcomes after each round
+    self.outcomes = np.zeros((1000, self.n_all_strats))
+    self.outcome_count = 0
+
   def next_action(self,
                   our_last_move,
                   his_last_move,
                   verbose=False,
                   prefix=''):
     """Generate next move based on opponent's last move"""
-
     # Force last move, so that we can use Kumoko as part of
     # a larger meta-agent
     self.our_last_move = our_last_move
@@ -83,12 +86,20 @@ class Kumoko:
     if verbose:
       print(f'step: {len(self.holistic_history)}')
 
-    # Update score for the previous game step
+    # Update score and other metrics for the previous game step
     if his_last_move is not None and \
         len(self.proposed_actions) > 0:
+      assert len(self.proposed_actions) == self.n_all_strats
 
-      assert len(self.proposed_actions) == \
-        self.n_all_strats
+      # Save outcomes in the memory and increase step counter
+      for pa, proposed_move in enumerate(self.proposed_actions):
+        if proposed_move == BEAT[his_last_move]:
+          self.outcomes[self.outcome_count, pa] = 1
+        elif proposed_move == CEDE[his_last_move]:
+          self.outcomes[self.outcome_count, pa] = -1
+        else:
+          self.outcomes[self.outcome_count, pa] = 0
+      self.outcome_count += 1
 
       # Meta-strategy selection score
       self.scores[...] = self.scoring.compute_scores(
