@@ -1,0 +1,44 @@
+- name: 9s_v1a-std_dllu_v1-best
+  kwargs:
+    ensemble_cls: 9_strats_v1a
+    scoring_cls: std_dllu_v1
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: best
+
+- name: 9s_v1a-static_wnd_v2-best
+  kwargs:
+    ensemble_cls: 9_strats_v1a
+    scoring_cls: static_wnd_v2
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: best
+
+- name: 9s_v1a-static_wnd_v2-vote5
+  kwargs:
+    ensemble_cls: 9_strats_v1a
+    scoring_cls: static_wnd_v2
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: vote5
+
+- name: 9s_v1a-risk_mng_v1-best
+  kwargs:
+    ensemble_cls: 9_strats_v1a
+    scoring_cls: risk_mng_v1
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: best
+
+- name: 9s_v1a-risk_mng_v1-vote5
+  kwargs:
+    ensemble_cls: 9_strats_v1a
+    scoring_cls: risk_mng_v1
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: vote5

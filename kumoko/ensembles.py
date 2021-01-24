@@ -9,6 +9,7 @@ from kumoko.strategies.hps_dojo_agent import HPSDojoStrategy
 from kumoko.strategies.testing_pls_ignore import TestingPlsIgnoreStrategy
 from kumoko.strategies.memory_patterns_v7 import MemoryPatternsV7Strategy
 from kumoko.strategies.centrifugal_bumblepuppy import CentrifugalBumblepuppy16h
+from kumoko.strategies.centrifugal_bumblepuppy import CentrifugalBumblepuppy4
 from kumoko.strategies.anti_trivial import AntiTrivialStrategy
 from kumoko.strategies.testimono import TestimonoStrategy
 from kumoko.strategies.statistical_prediction import StatisticalPredictionStrategy
@@ -1135,6 +1136,146 @@ class NineStratsV1a:
     return strategies, do_rotations
 
 
+class NineStratsV2a:
+  """
+  Contains 9 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - Centrifugal Bumblepuppy 4
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy4))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
+class TenStratsV1a:
+  """
+  Contains 10 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - Centrifugal Bumblepuppy 4
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  - Memory Patterns V7
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy4))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # Add memory pattern strategies
+    strategies.extend(
+        generate_meta_strategy_pair(MemoryPatternsV7Strategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
+
 ENSEMBLES = {
   # Basic ensembles and single agents
   'test': Testing,
@@ -1172,4 +1313,8 @@ ENSEMBLES = {
 
   # Ensembles with 9 strategies
   '9_strats_v1a': NineStratsV1a,
+  '9_strats_v2a': NineStratsV2a,
+
+  # Ensembles with 10 strategies
+  '10_strats_v1a': TenStratsV1a,
 }
