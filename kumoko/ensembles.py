@@ -15,6 +15,7 @@ from kumoko.strategies.testimono import TestimonoStrategy
 from kumoko.strategies.statistical_prediction import StatisticalPredictionStrategy
 from kumoko.strategies.geometry import GeometryV4Strategy
 from kumoko.strategies.iocane_powder import IocanePowderStrategy
+from kumoko.strategies.are_you_a_lucker import AreYouALuckerStrategy
 
 
 class Testing:
@@ -1215,7 +1216,7 @@ class TenStratsV1a:
   - Testimono
   - RPS Geometry
   - Iocane Powder (IOU Fight uuu)
-  - Memory Patterns V7
+  - Are you a lucker?
   """
   @staticmethod
   def generate():
@@ -1259,9 +1260,9 @@ class TenStratsV1a:
     strategies.extend(
         generate_meta_strategy_pair(IocanePowderStrategy))
 
-    # Add memory pattern strategies
+    # Add are you a lucker strategies
     strategies.extend(
-        generate_meta_strategy_pair(MemoryPatternsV7Strategy))
+        generate_meta_strategy_pair(AreYouALuckerStrategy))
 
     # By default, rotate everything
     do_rotations = [True for _ in strategies]
