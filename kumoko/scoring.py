@@ -324,7 +324,7 @@ SCORINGS = {
   'risk_mng_v1': risk_management_factory(
       window_sizes=[10, 20, 50],
       score_decays=[0.975, 0.975, 0.975],
-      loss_penalty_alphas=[0.2, 0.2, 0.2],
+      loss_penalty_alphas=[0.1, 0.1, 0.1],
       meta_scoring_config=[
           # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
             0.94,  3.00,    0.00,     -3.00,    0.50,      False,     True,
