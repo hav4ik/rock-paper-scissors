@@ -11,6 +11,14 @@ METAMETA_SCORINGS = {
         drop_prob=0.87,
         drop_draw=False,
         clip_zero=True),
+    'std_dllu_v2': get_dllu_scoring(
+        decay=0.94,
+        win_value=3.0,
+        draw_value=0.0,
+        lose_value=-3.0,
+        drop_prob=0.00,
+        drop_draw=False,
+        clip_zero=True),
 }
 
 

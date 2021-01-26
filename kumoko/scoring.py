@@ -311,6 +311,15 @@ SCORINGS = {
       ],
       safeguard=0.25),
 
+  # Static window scoring:
+  'static_wnd_v3': static_window_factory(
+      window_sizes=[10, 20, 50],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.00,      False,     True,
+      ],
+      safeguard=0.25),
+
   # Risk management scoring:
   'risk_mng_v1': risk_management_factory(
       window_sizes=[10, 20, 50],
