@@ -188,6 +188,32 @@ class Kumoko:
           NUM_TO_MOVE[voted_a]
           for voted_a in np.argmax(action_cum_scores, axis=1)]
 
+    elif self.action_choice == 'vote5rnd':
+      # Vote by summing the score for each action
+      action_cum_scores = np.zeros(
+          shape=(self.scores.shape[0], 3))
+
+      for sf in range(self.scores.shape[0]):
+        for pa in np.argsort(self.scores[sf])[::-1][:5]:
+          if self.scores[sf, pa] <= 0.0:
+            break
+          action = self.proposed_actions[pa]
+          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
+              self.scores[sf, pa]
+
+      action_cum_scores[np.isnan(action_cum_scores)] = 0.
+      def norm_or_rand(a, power=1):
+        aaa = np.power(a, power)
+        if aaa.sum() < 1e-5:
+          aa = np.random.rand(*aaa.shape)
+          assert aa.shape == aaa.shape
+        else:
+          return aaa / aaa.sum()
+
+      self.proposed_meta_actions = [
+          np.random.choice(['R', 'P', 'S'], p=norm_or_rand(cum_scores, 3))
+          for cum_scores in action_cum_scores]
+
     elif self.action_choice == 'vote10':
       # Vote by summing the score for each action
       action_cum_scores = np.zeros(
@@ -204,6 +230,32 @@ class Kumoko:
       self.proposed_meta_actions = [
           NUM_TO_MOVE[voted_a]
           for voted_a in np.argmax(action_cum_scores, axis=1)]
+
+    elif self.action_choice == 'vote10rnd':
+      # Vote by summing the score for each action
+      action_cum_scores = np.zeros(
+          shape=(self.scores.shape[0], 3))
+
+      for sf in range(self.scores.shape[0]):
+        for pa in np.argsort(self.scores[sf])[::-1][:10]:
+          if self.scores[sf, pa] <= 0.0:
+            break
+          action = self.proposed_actions[pa]
+          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
+              self.scores[sf, pa]
+
+      action_cum_scores[np.isnan(action_cum_scores)] = 0.
+      def norm_or_rand(a, power=1):
+        aaa = np.power(a, power)
+        if aaa.sum() < 1e-5:
+          aa = np.random.rand(*aaa.shape)
+          assert aa.shape == aaa.shape
+        else:
+          return aaa / aaa.sum()
+
+      self.proposed_meta_actions = [
+          np.random.choice(['R', 'P', 'S'], p=norm_or_rand(cum_scores, 3))
+          for cum_scores in action_cum_scores]
 
     else:
       # Not implemented
