@@ -82,6 +82,7 @@ class KumokoAgent:
         self.latest_action = self.geowrapper(
             MOVE_TO_NUM[s_our_last_move],
             MOVE_TO_NUM[s_his_last_move],
-            self.latest_action)
+            self.latest_action,
+            self.geometric)
 
     return self.latest_action
