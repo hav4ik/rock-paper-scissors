@@ -22,6 +22,7 @@ def generate_kumoko_file(ensemble_cls,
                          metameta_scoring,
                          fu_thresh,
                          action_choice,
+                         geometric=False,
                          verbose=False,
                          name=None,
                          tmp_dir='/tmp/kumoko/'):
@@ -42,8 +43,9 @@ kumoko_agent = KumokoAgent(
       use_meta={use_meta},
       metameta_scoring='{metameta_scoring}',
       fuck_you_thresh={fu_thresh},
+      geometric={geometric},
       action_choice='{action_choice}',
-      verbose=True)
+      verbose={verbose})
 
 def agent(obs, cfg):
   global kumoko_agent
@@ -122,11 +124,12 @@ if __name__ == '__main__':
   kumoko_grp.add_argument('-w', '--metameta_scoring', default='std_dllu_v1')
   kumoko_grp.add_argument('-u', '--use_meta', action='store_true')
   kumoko_grp.add_argument('-f', '--fu_thresh', type=int, default=None)
+  kumoko_grp.add_argument('-g', '--geometric', type=float, default=None)
   kumoko_grp.add_argument('-c', '--action_choice', default='best')
   args = parser.parse_args()
 
   # Agent to eval
-  if args.dojo == 'perf':
+  if args.dojo == 'test':
     if os.path.exists(args.ensemble):
       agent_to_eval = args.ensemble
     else:
@@ -136,12 +139,16 @@ if __name__ == '__main__':
           use_meta=args.use_meta,
           metameta_scoring=args.metameta_scoring,
           fu_thresh=args.fu_thresh,
+          geometric=args.geometric,
           action_choice=args.action_choice,
           verbose=True)
-    trivial_opponent = lambda obs, cfg: random.randint(0, 2)
-    env = kaggle_environments.make(
-        "rps", configuration={"episodeSteps": 1000}, debug=True)
-    outcomes = env.run([agent_to_eval, trivial_opponent])
+
+    # Form list of enemies
+    if args.dojo == 'test':
+      env = kaggle_environments.make(
+          "rps", configuration={"episodeSteps": 100}, debug=True)
+      outcomes = env.run([agent_to_eval, 'opponents/reactionary.py'])
+      print('FINAL REWARD:', outcomes[-1][0]['reward'])
 
   else:
     if os.path.exists(args.ensemble):
@@ -153,14 +160,15 @@ if __name__ == '__main__':
           use_meta=args.use_meta,
           metameta_scoring=args.metameta_scoring,
           fu_thresh=args.fu_thresh,
+          geometric=args.geometric,
           action_choice=args.action_choice,
           verbose=False)
 
-    # Form list of enemies
-    if args.dojo == 'test':
+    if args.dojo == 'perf':
+      trivial_opponent = lambda obs, cfg: random.randint(0, 2)
       env = kaggle_environments.make(
-          "rps", configuration={"episodeSteps": 100}, debug=True)
-      outcomes = env.run([agent_to_eval, 'opponents/rps_meta_fix.py'])
+          "rps", configuration={"episodeSteps": 1000}, debug=True)
+      outcomes = env.run([agent_to_eval, trivial_opponent])
 
     elif args.dojo == 'full':
       agents = [

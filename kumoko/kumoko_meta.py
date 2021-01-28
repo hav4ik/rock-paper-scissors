@@ -11,7 +11,9 @@ METAMETA_SCORINGS = {
         drop_prob=0.87,
         drop_draw=False,
         clip_zero=True),
-    'std_dllu_v2': get_dllu_scoring(
+
+    # The old one is when there's no zeroing
+    'std_dllu_v1_old': get_dllu_scoring(
         decay=0.94,
         win_value=3.0,
         draw_value=0.0,

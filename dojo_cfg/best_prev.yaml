@@ -1,0 +1,18 @@
+- name: 4_strats_v2b
+  kwargs:
+    ensemble_cls: 4_strats_v2b
+    scoring_cls: std_dllu_v1_old
+    metameta_scoring: std_dllu_v1_old
+    use_meta: true
+    fu_thresh: null
+    action_choice: vote
+
+- name: 8_strats_v1a
+  kwargs:
+    ensemble_cls: 8_strats_v1a
+    scoring_cls: static_wnd_v2_old
+    metameta_scoring: std_dllu_v1_old
+    use_meta: true
+    fu_thresh: null
+    action_choice: best
+

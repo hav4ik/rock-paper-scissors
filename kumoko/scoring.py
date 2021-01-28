@@ -294,6 +294,20 @@ SCORINGS = {
             0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
       ]),
 
+  # DLLU-based scorings:
+  'std_dllu_v1_old': standard_dllu_factory(
+      scoring_configs=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+          [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
+          [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    0.00,      True,      False    ],
+      ],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.0,      False,     True,
+      ]),
+
   # Static window scoring:
   'static_wnd_v1': static_window_factory(
       window_sizes=[10, 20, 50],
@@ -312,7 +326,7 @@ SCORINGS = {
       safeguard=0.25),
 
   # Static window scoring:
-  'static_wnd_v3': static_window_factory(
+  'static_wnd_v2_old': static_window_factory(
       window_sizes=[10, 20, 50],
       meta_scoring_config=[
           # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero

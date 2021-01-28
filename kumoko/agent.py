@@ -10,6 +10,7 @@ from kumoko.kumoko_meta import MetaKumoko
 from kumoko.kumoko import Kumoko
 from kumoko.ensembles import ENSEMBLES
 from kumoko.scoring import SCORINGS
+from kumoko.geometry_wrapper import GeometryWrapper
 
 
 class KumokoAgent:
@@ -20,6 +21,7 @@ class KumokoAgent:
                metameta_scoring='std_dllu_v1',
                fuck_you_thresh=None,
                action_choice='best',
+               geometric=None,
                verbose=False):
 
     kumoko_cls = partial(Kumoko,
@@ -36,7 +38,18 @@ class KumokoAgent:
     self.latest_action = None
     self.current_score = 0
     self.fuck_you_thresh = fuck_you_thresh
+    self.geometric = geometric
     self.verbose = verbose
+
+    if self.geometric:
+      self.geowrapper = GeometryWrapper()
+
+    if self.verbose:
+      print('use_meta:', use_meta)
+      print('metameta_scoring:', metameta_scoring)
+      print('fu thresh:', fuck_you_thresh),
+      print('action_choice:', action_choice)
+      print('geometric:', geometric)
 
   def __call__(self, obs, conf):
     if obs.step == 0:
@@ -55,13 +68,20 @@ class KumokoAgent:
 
     self.latest_action = MOVE_TO_NUM[s_move]
 
-    # Surprise motherfucker
-    if random.random() < 0.1 or random.randint(3, 40) > obs.step:
-      self.latest_action = random.randint(0, 2)
-
-    # Fuck you!!!
-    if self.fuck_you_thresh is not None:
-      if self.current_score < -self.fuck_you_thresh:
+    if self.geometric is None:
+      # Surprise motherfucker
+      if random.random() < 0.1 or random.randint(3, 40) > obs.step:
         self.latest_action = random.randint(0, 2)
+
+      # Fuck you!!!
+      if self.fuck_you_thresh is not None:
+        if self.current_score < -self.fuck_you_thresh:
+          self.latest_action = random.randint(0, 2)
+    else:
+      if obs.step > 0:
+        self.latest_action = self.geowrapper(
+            MOVE_TO_NUM[s_our_last_move],
+            MOVE_TO_NUM[s_his_last_move],
+            self.latest_action)
 
     return self.latest_action
