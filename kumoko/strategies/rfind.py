@@ -2,6 +2,7 @@ import random
 from kumoko.kumoko_base import *
 from kumoko.kumoko import Kumoko
 from kumoko.scoring import SCORINGS
+from kumoko.action_choice import ACTION_CHOICES
 from functools import partial
 
 
@@ -104,7 +105,10 @@ class WrappedRFindStrategy(BaseAtomicStrategy):
                            sources=sources,
                            shenanigans=shenanigans)
     scoring_cls = SCORINGS['std_dllu_v1']
-    self.kumoko = Kumoko(ensemble_cls=ensemble_cls, scoring_cls=scoring_cls)
+    action_choice_cls = ACTION_CHOICES['best']
+    self.kumoko = Kumoko(ensemble_cls=ensemble_cls,
+                         scoring_cls=scoring_cls,
+                         action_choice_cls=action_choice_cls)
 
   def __call__(self, history):
     if len(history) > 0:

@@ -2,10 +2,10 @@
   kwargs:
     ensemble_cls: 4_strats_v2b
     scoring_cls: std_dllu_v1_old
+    action_choice: vote
     metameta_scoring: std_dllu_v1_old
     use_meta: true
     fu_thresh: null
-    action_choice: vote
 
 - name: 8_strats_v1a
   kwargs:

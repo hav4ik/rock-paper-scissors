@@ -22,7 +22,7 @@ def generate_kumoko_file(ensemble_cls,
                          metameta_scoring,
                          fu_thresh,
                          action_choice,
-                         geometric=False,
+                         geometric=None,
                          verbose=False,
                          name=None,
                          tmp_dir='/tmp/kumoko/'):
@@ -35,16 +35,17 @@ def generate_kumoko_file(ensemble_cls,
 from kumoko.agent import KumokoAgent
 from kumoko.ensembles import ENSEMBLES
 from kumoko.scoring import SCORINGS
+from kumoko.action_choice import ACTION_CHOICES
 
 global kumoko_agent
 kumoko_agent = KumokoAgent(
       ensemble_cls=ENSEMBLES['{ensemble_cls}'],
       scoring_cls=SCORINGS['{scoring_cls}'],
+      action_choice_cls=ACTION_CHOICES['{action_choice}'],
       use_meta={use_meta},
       metameta_scoring='{metameta_scoring}',
       fuck_you_thresh={fu_thresh},
       geometric={geometric},
-      action_choice='{action_choice}',
       verbose={verbose})
 
 def agent(obs, cfg):

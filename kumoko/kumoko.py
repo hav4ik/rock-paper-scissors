@@ -8,7 +8,7 @@ class Kumoko:
   def __init__(self,
                ensemble_cls,
                scoring_cls,
-               action_choice='best'):
+               action_choice_cls):
     """
     Arguments:
       ensemble: implementation of EnsembleBase interface
@@ -20,7 +20,7 @@ class Kumoko:
     self.holistic_history = HolisticHistoryHolder()
     self.strategies, self.do_rotations = ensemble_cls().generate()
     self.scoring = scoring_cls()
-    self.action_choice = action_choice
+    self.action_choice = action_choice_cls()
 
     # Assert that all strats are unique objects
     strat_ids = set()
@@ -68,7 +68,8 @@ class Kumoko:
                   our_last_move,
                   his_last_move,
                   verbose=False,
-                  prefix=''):
+                  prefix='',
+                  gotcha=None):
     """Generate next move based on opponent's last move"""
     # Force last move, so that we can use Kumoko as part of
     # a larger meta-agent
@@ -85,6 +86,10 @@ class Kumoko:
     # If verbose, we output a YAML at each step for debugging
     if verbose:
       print(f'step: {len(self.holistic_history)}')
+
+    # ------------------------------------------------------------
+    # UPDATE SCORES AND METRICS
+    # ------------------------------------------------------------
 
     # Update score and other metrics for the previous game step
     if his_last_move is not None and \
@@ -108,6 +113,10 @@ class Kumoko:
       # Selector selection score
       self.meta_scores[...] = self.scoring.compute_meta_scores(
           self.proposed_meta_actions, his_last_move)
+
+    # ------------------------------------------------------------
+    # GENERATE NEXT MOVES
+    # ------------------------------------------------------------
 
     # Generate next move for each strategy
     if len(self.proposed_actions) == 0:
@@ -140,127 +149,14 @@ class Kumoko:
             # Index shift counter
             strats_with_rots_counter += 1
 
+    # ------------------------------------------------------------
+    # ACTION CHOOSING
+    # ------------------------------------------------------------
+
     # For each scoring function (selector), choose the
     # action based on all of our policy actors
-    if self.action_choice == 'best':
-      # Simply choose the action with best score
-      best_actions_idx = np.argmax(self.scores, axis=1)
-      self.proposed_meta_actions = [
-          self.proposed_actions[idx]
-          for idx in best_actions_idx]
-      assert len(best_actions_idx) == self.scores.shape[0]
-      assert len(self.proposed_meta_actions) == self.scores.shape[0]
-      for sf in range(self.scores.shape[0]):
-        if self.scores[sf, best_actions_idx[sf]] < 1e-5:
-          self.proposed_meta_actions[sf] = random.choice('RPS')
-
-    elif self.action_choice == 'vote':
-      # Vote by summing the score for each action
-      action_cum_scores = np.zeros(
-          shape=(self.scores.shape[0], 3))
-
-      for sf in range(self.scores.shape[0]):
-        for pa in np.argsort(self.scores[sf])[::-1]:
-          if self.scores[sf, pa] <= 0.0:
-            break
-          action = self.proposed_actions[pa]
-          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
-              self.scores[sf, pa]
-
-      self.proposed_meta_actions = [
-          NUM_TO_MOVE[voted_a]
-          for voted_a in np.argmax(action_cum_scores, axis=1)]
-
-    elif self.action_choice == 'vote5':
-      # Vote by summing the score for each action
-      action_cum_scores = np.zeros(
-          shape=(self.scores.shape[0], 3))
-
-      for sf in range(self.scores.shape[0]):
-        for pa in np.argsort(self.scores[sf])[::-1][:5]:
-          if self.scores[sf, pa] <= 0.0:
-            break
-          action = self.proposed_actions[pa]
-          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
-              self.scores[sf, pa]
-
-      self.proposed_meta_actions = [
-          NUM_TO_MOVE[voted_a]
-          for voted_a in np.argmax(action_cum_scores, axis=1)]
-
-    elif self.action_choice == 'vote5rnd':
-      # Vote by summing the score for each action
-      action_cum_scores = np.zeros(
-          shape=(self.scores.shape[0], 3))
-
-      for sf in range(self.scores.shape[0]):
-        for pa in np.argsort(self.scores[sf])[::-1][:5]:
-          if self.scores[sf, pa] <= 0.0:
-            break
-          action = self.proposed_actions[pa]
-          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
-              self.scores[sf, pa]
-
-      action_cum_scores[np.isnan(action_cum_scores)] = 0.
-      def norm_or_rand(a, power=1):
-        aaa = np.power(a, power)
-        if aaa.sum() < 1e-5:
-          aa = np.random.rand(*aaa.shape)
-          assert aa.shape == aaa.shape
-        else:
-          return aaa / aaa.sum()
-
-      self.proposed_meta_actions = [
-          np.random.choice(['R', 'P', 'S'], p=norm_or_rand(cum_scores, 3))
-          for cum_scores in action_cum_scores]
-
-    elif self.action_choice == 'vote10':
-      # Vote by summing the score for each action
-      action_cum_scores = np.zeros(
-          shape=(self.scores.shape[0], 3))
-
-      for sf in range(self.scores.shape[0]):
-        for pa in np.argsort(self.scores[sf])[::-1][:10]:
-          if self.scores[sf, pa] <= 0.0:
-            break
-          action = self.proposed_actions[pa]
-          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
-              self.scores[sf, pa]
-
-      self.proposed_meta_actions = [
-          NUM_TO_MOVE[voted_a]
-          for voted_a in np.argmax(action_cum_scores, axis=1)]
-
-    elif self.action_choice == 'vote10rnd':
-      # Vote by summing the score for each action
-      action_cum_scores = np.zeros(
-          shape=(self.scores.shape[0], 3))
-
-      for sf in range(self.scores.shape[0]):
-        for pa in np.argsort(self.scores[sf])[::-1][:10]:
-          if self.scores[sf, pa] <= 0.0:
-            break
-          action = self.proposed_actions[pa]
-          action_cum_scores[sf, MOVE_TO_NUM[action]] += \
-              self.scores[sf, pa]
-
-      action_cum_scores[np.isnan(action_cum_scores)] = 0.
-      def norm_or_rand(a, power=1):
-        aaa = np.power(a, power)
-        if aaa.sum() < 1e-5:
-          aa = np.random.rand(*aaa.shape)
-          assert aa.shape == aaa.shape
-        else:
-          return aaa / aaa.sum()
-
-      self.proposed_meta_actions = [
-          np.random.choice(['R', 'P', 'S'], p=norm_or_rand(cum_scores, 3))
-          for cum_scores in action_cum_scores]
-
-    else:
-      # Not implemented
-      raise NotImplementedError(
-        f'Action choice {self.action_choice} is not implemented.')
+    self.proposed_meta_scores = self.action_choice.choose(
+        self.proposed_actions, self.scores)
 
     # Meta-Selector: selecting the scoring function
     if DEBUG_MODE:

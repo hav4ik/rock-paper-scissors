@@ -11,23 +11,24 @@ from kumoko.kumoko import Kumoko
 from kumoko.ensembles import ENSEMBLES
 from kumoko.scoring import SCORINGS
 from kumoko.geometry_wrapper import GeometryWrapper
+from kumoko.action_choice import ACTION_CHOICES
 
 
 class KumokoAgent:
   def __init__(self,
                ensemble_cls=ENSEMBLES['rfind_v1'],
                scoring_cls=SCORINGS['std_dllu_v1'],
+               action_choice_cls=ACTION_CHOICES['best'],
                use_meta=True,
                metameta_scoring='std_dllu_v1',
                fuck_you_thresh=None,
-               action_choice='best',
                geometric=None,
                verbose=False):
 
     kumoko_cls = partial(Kumoko,
                          ensemble_cls=ensemble_cls,
                          scoring_cls=scoring_cls,
-                         action_choice=action_choice)
+                         action_choice_cls=action_choice_cls)
     if use_meta:
       self.kumoko_agent = MetaKumoko(
           kumoko_cls,
@@ -48,7 +49,6 @@ class KumokoAgent:
       print('use_meta:', use_meta)
       print('metameta_scoring:', metameta_scoring)
       print('fu thresh:', fuck_you_thresh),
-      print('action_choice:', action_choice)
       print('geometric:', geometric)
 
   def __call__(self, obs, conf):
