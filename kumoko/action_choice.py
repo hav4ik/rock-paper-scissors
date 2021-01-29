@@ -16,21 +16,50 @@ class ActionChoiceSimple(BaseActionChoice):
                top_k=1,
                only_positive=False,
                rnd=False,
-               rnd_power=1.):
+               rnd_power=1.,
+               holdout_trigger=None,
+               holdout_patience=None):
     self.top_k = top_k
     self.rnd = rnd
     self.rnd_power = rnd_power
     self.only_positive = only_positive
 
-  def choose(self, proposed_actions, scores):
+    self.holdout_trigger = holdout_trigger
+    self.holdout_counter = 0
+    self.holdout_patience = holdout_patience
+    self.holdout_scores = None
+    assert (holdout_trigger is None and holdout_patience is None) or (
+        holdout_trigger is not None and holdout_patience is not None)
+
+  def choose(self, proposed_actions, scores, kumo_outcomes, last_chosen_meta_idx):
     """
     Arguments:
     - poposed_actions: a vector of actions
     - scores: a array [sf, pa] of scores
     """
+    if self.holdout_trigger is not None:
+      # trigger holdout mode if we had bad outcomes OR is already in one
+      if self.holdout_counter == 0 \
+          and len(kumo_outcomes) >= self.holdout_trigger \
+          and np.sum(kumo_outcomes[-self.holdout_trigger:]) == -self.holdout_trigger:
+        self.holdout_counter += 1
+        if last_chosen_meta_idx is not None:
+          scores[last_chosen_meta_idx] = self.holdout_scores[last_chosen_meta_idx]
+      # If not in holdout mode, just save the last scores
+      elif self.holdout_counter == 0:
+        self.holdout_scores = scores.copy()
+      # If we're over that period, stop
+      elif self.holdout_counter == self.holdout_patience:
+        self.holdout_counter = 0
+        self.holdout_scores = scores
+      else:
+        self.holdout_counter += 1
+        if last_chosen_meta_idx is not None:
+          scores[last_chosen_meta_idx] = self.holdout_scores[last_chosen_meta_idx]
+
     action_cum_scores = np.zeros((scores.shape[0], 3,))
     for sf in range(scores.shape[0]):
-      for pa in np.argsort(scores[sf][::-1][:self.top_k]):
+      for pa in np.argsort(scores[sf])[::-1][:self.top_k]:
         if self.only_positive and scores[sf, pa] < 0.0:
           break
         action = proposed_actions[pa]
@@ -61,19 +90,26 @@ class ActionChoiceSimple(BaseActionChoice):
           np.random.choice(['R', 'P', 'S'], p=norm_or_rand(cum_scores, 3))
           for cum_scores in action_cum_scores]
 
-    return proposed_meta_actions
-
+    holdout_action = None
+    if self.holdout_counter > 0 and last_chosen_meta_idx is not None:
+      # If we're in holdout mode, we need to play a move that loses to our strats
+      holdout_action = CEDE[proposed_meta_actions[last_chosen_meta_idx]]
+    return proposed_meta_actions, holdout_action
 
 
 def action_choice_simple_factory(top_k,
                                  only_positive,
                                  rnd,
-                                 rnd_power=1.0):
+                                 rnd_power=None,
+                                 holdout_trigger=None,
+                                 holdout_patience=None):
   return partial(ActionChoiceSimple,
                  top_k=top_k,
                  only_positive=only_positive,
                  rnd=rnd,
-                 rnd_power=rnd_power)
+                 rnd_power=rnd_power,
+                 holdout_trigger=holdout_trigger,
+                 holdout_patience=holdout_patience)
 
 
 ACTION_CHOICES = {
@@ -81,6 +117,13 @@ ACTION_CHOICES = {
         top_k=1,
         only_positive=True,
         rnd=False),
+
+    'best_hld_v1': action_choice_simple_factory(
+        top_k=1,
+        only_positive=True,
+        rnd=False,
+        holdout_trigger=2,
+        holdout_patience=3),
 
     'vote': action_choice_simple_factory(
         top_k=None,
@@ -91,6 +134,13 @@ ACTION_CHOICES = {
         top_k=5,
         only_positive=True,
         rnd=False),
+
+    'vote5_hld_v1': action_choice_simple_factory(
+        top_k=5,
+        only_positive=True,
+        rnd=False,
+        holdout_trigger=2,
+        holdout_patience=3),
 
     'vote5rnd': action_choice_simple_factory(
         top_k=5,

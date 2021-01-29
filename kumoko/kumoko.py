@@ -63,6 +63,8 @@ class Kumoko:
     # Outcomes after each round
     self.outcomes = np.zeros((1000, self.n_all_strats))
     self.outcome_count = 0
+    self.kumo_outcomes = []
+    self.last_chosen_meta_idx = None
 
   def next_action(self,
                   our_last_move,
@@ -105,6 +107,13 @@ class Kumoko:
         else:
           self.outcomes[self.outcome_count, pa] = 0
       self.outcome_count += 1
+
+      if self.our_last_move == BEAT[his_last_move]:
+        self.kumo_outcomes.append(1)
+      elif self.our_last_move == CEDE[his_last_move]:
+        self.kumo_outcomes.append(-1)
+      else:
+        self.kumo_outcomes.append(0)
 
       # Meta-strategy selection score
       self.scores[...] = self.scoring.compute_scores(
@@ -155,8 +164,9 @@ class Kumoko:
 
     # For each scoring function (selector), choose the
     # action based on all of our policy actors
-    self.proposed_meta_scores = self.action_choice.choose(
-        self.proposed_actions, self.scores)
+    self.proposed_meta_actions, holdout_action = self.action_choice.choose(
+        self.proposed_actions, self.scores,
+        self.kumo_outcomes, self.last_chosen_meta_idx)
 
     # Meta-Selector: selecting the scoring function
     if DEBUG_MODE:
@@ -166,10 +176,17 @@ class Kumoko:
     best_meta_action_idx = np.argmax(self.meta_scores)
     self.our_last_move = \
       self.proposed_meta_actions[best_meta_action_idx]
+    self.last_chosen_meta_idx = best_meta_action_idx
+
+    if holdout_action is not None:
+      self.our_last_move = holdout_action
 
     if verbose:
-      print(prefix + 'proposed:')
       score_names = self.scoring.get_score_names()
+      print(prefix + 'holdout:', (holdout_action is not None))
+      print(prefix + f'chosen_scoring: {score_names[best_meta_action_idx]}')
+      print(prefix + f'chosen_action: {self.our_last_move}')
+      print(prefix + 'proposed:')
       for sf in np.argsort(self.meta_scores)[::-1]:
         print(f'  - {self.proposed_meta_actions[sf]} ' \
                   f'({self.meta_scores[sf]:.2f}) ' \
@@ -179,8 +196,5 @@ class Kumoko:
           print(f'    - {self.proposed_actions[idx]} ' \
                       f'({self.scores[sf, idx]:.2f}) ' \
                       f'{self.strategy_names[idx]}')
-
-      print(prefix + f'chosen_scoring: {score_names[best_meta_action_idx]}')
-      print(prefix + f'chosen_action: {self.our_last_move}')
 
     return self.our_last_move
