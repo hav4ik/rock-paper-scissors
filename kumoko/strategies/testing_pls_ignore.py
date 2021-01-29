@@ -43,7 +43,7 @@ class TestingPleaseIgnore:
         self.sc = 0
         self.strats = [[] for i in range(3)]
         
-    def next_action(self, T, A, S):
+    def next_action(self, T, A, S, B):
         if T == 0:
             self.B = random.choice(self.rps)
             return {'R': 0, 'P': 1, 'S': 2}[self.B]
@@ -152,11 +152,12 @@ class TestingPlsIgnoreStrategy(BaseAtomicStrategy):
     T = len(history)
     if T > 0:
       A = MOVE_TO_NUM[history.his_moves[-1]]
+      B = MOVE_TO_NUM[history.our_moves[-1]]
     else:
       A = None
+      B = random.randint(0, 2)
     S = 3
-
-    return NUM_TO_MOVE[int(self.submission.next_action(T, A, S))]
+    return NUM_TO_MOVE[int(self.submission.next_action(T, A, S, B))]
 
 # def agent(observation, configuration):
 #     T = observation.step

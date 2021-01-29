@@ -334,6 +334,15 @@ SCORINGS = {
       ],
       safeguard=0.25),
 
+  # Static window scoring:
+  'static_wnd_v4': static_window_factory(
+      window_sizes=[5, 10, 20, 50, 75],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
+      ],
+      safeguard=0.20),
+
   # Risk management scoring:
   'risk_mng_v1': risk_management_factory(
       window_sizes=[10, 20, 50],
@@ -342,6 +351,17 @@ SCORINGS = {
       meta_scoring_config=[
           # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
             0.94,  3.00,    0.00,     -3.00,    0.50,      False,     True,
+      ],
+      safeguard=0.20),
+
+  # Risk management scoring:
+  'risk_mng_v2': risk_management_factory(
+      window_sizes=[5, 10, 20, 50, 75],
+      score_decays=[0.90, 0.94, 0.96, 0.97, 0.99],
+      loss_penalty_alphas=[0.1, 0.1, 0.1, 0.1, 0.1],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
       ],
       safeguard=0.20),
 }
