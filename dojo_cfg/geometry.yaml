@@ -1,17 +1,17 @@
 - opponents/geometry.py
-- name: geom_v4
-  kwargs:
-    ensemble_cls: geom_v4
-    scoring_cls: std_dllu_v1
-    metameta_scoring: std_dllu_v1
-    use_meta: true
-    fu_thresh: null
-    action_choice: best
-- name: geom_v4_aug
-  kwargs:
-    ensemble_cls: geom_v4_aug
-    scoring_cls: std_dllu_v1
-    metameta_scoring: std_dllu_v1
-    use_meta: true
-    fu_thresh: null
-    action_choice: best
+  # - name: geom_v4
+  #   kwargs:
+  #     ensemble_cls: geom_v4
+  #     scoring_cls: std_dllu_v1
+  #     metameta_scoring: std_dllu_v1
+  #     use_meta: true
+  #     fu_thresh: null
+  #     action_choice: best
+  # - name: geom_v4_aug
+  #   kwargs:
+  #     ensemble_cls: geom_v4_aug
+  #     scoring_cls: std_dllu_v1
+  #     metameta_scoring: std_dllu_v1
+  #     use_meta: true
+  #     fu_thresh: null
+  #     action_choice: best

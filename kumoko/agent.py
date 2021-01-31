@@ -12,6 +12,7 @@ from kumoko.ensembles import ENSEMBLES
 from kumoko.scoring import SCORINGS
 from kumoko.geometry_wrapper import GeometryWrapper
 from kumoko.action_choice import ACTION_CHOICES
+from kumoko.strategies.geobot_beater import GeobotBeater
 
 
 class KumokoAgent:
@@ -23,6 +24,7 @@ class KumokoAgent:
                metameta_scoring='std_dllu_v1',
                fuck_you_thresh=None,
                geometric=None,
+               antigeo_thresh=20,
                verbose=False):
 
     kumoko_cls = partial(Kumoko,
@@ -45,6 +47,18 @@ class KumokoAgent:
     if self.geometric:
       self.geowrapper = GeometryWrapper()
 
+    self.antigeo_thresh = antigeo_thresh
+    if self.antigeo_thresh is not None:
+      # Monitor geobeater
+      self.geobeater = GeobotBeater()
+      self.geobeater_score = 0
+      self.geobeater_last_move = None
+      self.should_use_geobeater = False
+
+    # Monitor kumoko
+    self.kumo_score = 0
+    self.kumo_last_move = None
+
     if self.verbose:
       print('use_meta:', use_meta)
       print('metameta_scoring:', metameta_scoring)
@@ -66,7 +80,29 @@ class KumokoAgent:
       s_move = self.kumoko_agent.next_action(
           s_our_last_move, s_his_last_move, self.verbose)
 
-    self.latest_action = MOVE_TO_NUM[s_move]
+    # Update geobot actions before making changes to self.latest_actions
+    if self.antigeo_thresh is not None and obs.step > 0:
+      # Calculate geobeater's score
+      if self.geobeater_last_move is not None:
+        s_geobeater_last_move = NUM_TO_MOVE[self.geobeater_last_move]
+        if s_geobeater_last_move == BEAT[s_his_last_move]:
+          self.geobeater_score += 1
+        elif s_geobeater_last_move == CEDE[s_his_last_move]:
+          self.geobeater_score -= 1
+      # Get geobeater's last action
+      self.geobeater_last_move = self.geobeater(
+          obs.step, self.latest_action, obs.lastOpponentAction)
+
+    # Update kumoko actions before making changes to kumo_last_move
+    if obs.step > 0:
+      if self.kumo_last_move == (obs.lastOpponentAction + 1) % 3:
+        self.kumo_score += 1
+      elif self.kumo_last_move == (obs.lastOpponentAction + 2) % 3:
+        self.kumo_score += -1
+
+    # Update the self.latest_action
+    self.kumo_last_move = MOVE_TO_NUM[s_move]
+    self.latest_action = self.kumo_last_move
 
     if self.geometric is None:
       # Surprise motherfucker
@@ -84,5 +120,18 @@ class KumokoAgent:
             MOVE_TO_NUM[s_his_last_move],
             self.latest_action,
             self.geometric)
+
+    # # Maybe we should do it here?
+    # self.kumo_last_move = self.latest_action
+
+    # Try to understand if we can use anti-geometric strat (it's very subtle)
+    if self.antigeo_thresh is not None and obs.step > 0:
+      # If it's already winning, it is clearly up to something
+      # if (self.geobeater_score >= self.antigeo_thresh and \
+      #     self.current_score < self.geobeater_score) or \
+      #     self.current_score <= -self.antigeo_thresh:
+      if self.kumo_score < self.geobeater_score and self.geobeater_score > self.antigeo_thresh:
+        # Unleash the geobeater
+        self.latest_action = self.geobeater_last_move
 
     return self.latest_action

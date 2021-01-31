@@ -279,6 +279,32 @@ def risk_management_factory(window_sizes,
                  safeguard)
 
 
+class CombinedScoring(BaseScoringOracle):
+  def __init__(self,
+               scoring_strategies,
+               use_local_meta_scores=False,
+               global_score_choice=None):
+    super().__init__()
+    self.scoring_strategies = [
+        scoring_cls()
+        for scoring_cls in scoring_strategies]
+    self.num_strategies = -1
+    self.combined_scores = None
+
+  def set_num_strategies(self, n):
+    self.num_strategies = n
+
+    # Initialize num strats on each child scoring
+    for scoring_strategy in self.scoring_strategies:
+      scoring_strategy.set_num_strategies(n)
+
+    # Combined scores collects all scoring matrices
+    # from each scoring strategy
+    self.combined_scores = [
+        scoring_strategy.get_initial_scores()
+        for scoring_strategy in self.scoring_strategies]
+
+
 SCORINGS = {
   # DLLU-based scorings:
   'std_dllu_v1': standard_dllu_factory(

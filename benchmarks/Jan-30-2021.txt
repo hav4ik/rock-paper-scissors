@@ -1,0 +1,89 @@
+
+python dojo.py dojo_cfg/rpscontest.yaml -m -e 10_strats_v1a -u -s static_wnd_v2 -t 20
+Loading environment football failed: No module named 'gfootball'
+
+Evaluating /tmp/kumoko/kumoko_8debc92ecda74881aded9bd6cd2f3a61.py:
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+dllu1                          ---  9/ 0/ 1 --- 276.0
+iocaine_powder                 ---  2/ 4/ 4 --- -1376.0
+testimono                      --- 10/ 0/ 0 --- 10.0
+centrifugal_bumblepuppy_1000   ---  4/ 2/ 4 --- -1796.0
+centrifugal_bumblepuppy_5      ---  3/ 1/ 6 --- -3508.0
+centrifugal_bumblepuppy_13     ---  1/ 3/ 6 --- -2288.0
+centrifugal_bumblepuppy_4      ---  9/ 0/ 1 --- 919.0
+centrifugal_bumblepuppy_16h    ---  9/ 0/ 1 --- 3964.0
+greenberg                      ---  4/ 5/ 1 --- 115.0
+rps_meta_fix                   ---  1/ 3/ 6 --- -1479.0
+
+
+python dojo.py dojo_cfg/rpscontest.yaml -m -e 10_strats_v1a -u -s static_wnd_v2 -t 10000
+Loading environment football failed: No module named 'gfootball'
+
+Evaluating /tmp/kumoko/kumoko_b1a34cd9c7aa4aae80e47fbad95a2217.py:
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+dllu1                          ---  9/ 1/ 0 --- 420.0
+iocaine_powder                 ---  3/ 7/ 0 --- 98.0
+testimono                      --- 10/ 0/ 0 --- 10.0
+centrifugal_bumblepuppy_1000   ---  5/ 4/ 1 --- 197.0
+centrifugal_bumblepuppy_5      ---  9/ 1/ 0 --- 561.0
+centrifugal_bumblepuppy_13     ---  1/ 7/ 2 --- -39.0
+centrifugal_bumblepuppy_4      --- 10/ 0/ 0 --- 1768.0
+centrifugal_bumblepuppy_16h    --- 10/ 0/ 0 --- 5218.0
+greenberg                      ---  4/ 5/ 1 --- 69.0
+rps_meta_fix                   ---  2/ 4/ 4 --- -53.0
+
+
+
+--------------------------------------------
+opponent_name        ---  w/ t/ l --- total
+--------------------------------------------
+anonymous strategy 1 ---  9/ 0/ 1 --- 276.0
+anonymous strategy 2 ---  2/ 4/ 4 --- -1376.0
+anonymous strategy 3 --- 10/ 0/ 0 --- 10.0
+anonymous strategy 4 ---  4/ 2/ 4 --- -1796.0
+anonymous strategy 5 ---  3/ 1/ 6 --- -3508.0
+anonymous strategy 6 ---  1/ 3/ 6 --- -2288.0
+anonymous strategy 7 ---  9/ 0/ 1 --- 919.0
+anonymous strategy 8 ---  9/ 0/ 1 --- 3964.0
+anonymous strategy 9 ---  4/ 5/ 1 --- 115.0
+anonymous strategy 0 ---  1/ 3/ 6 --- -1479.0
+
+
+
+---------------------------------------------
+opponent_name        ---  w/ t/ l --- total
+---------------------------------------------
+anonymous strategy 1 ---  9/ 1/ 0 --- 420.0
+anonymous strategy 2 ---  3/ 7/ 0 --- 98.0
+anonymous strategy 3 --- 10/ 0/ 0 --- 10.0
+anonymous strategy 4 ---  5/ 4/ 1 --- 197.0
+anonymous strategy 5 ---  9/ 1/ 0 --- 561.0
+anonymous strategy 6 ---  1/ 7/ 2 --- -39.0
+anonymous strategy 7 --- 10/ 0/ 0 --- 1768.0
+anonymous strategy 8 --- 10/ 0/ 0 --- 5218.0
+anonymous strategy 9 ---  4/ 5/ 1 --- 69.0
+anonymous strategy 0 ---  2/ 4/ 4 --- -53.0
+
+
+
+python dojo.py dojo_cfg/rpscontest.yaml -e 10_strats_v1a -u -s static_wnd_v2 -t -1000
+Loading environment football failed: No module named 'gfootball'
+
+Evaluating /tmp/kumoko/kumoko_8d9faddc3d724f4c85e24beb26610197.py:
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+centrifugal_bumblepuppy_4      --- 10/ 0/ 0 --- 1702.0
+centrifugal_bumblepuppy_1000   ---  3/ 4/ 3 --- 19.0
+centrifugal_bumblepuppy_13     ---  1/ 7/ 2 --- -40.0
+centrifugal_bumblepuppy_16h    --- 10/ 0/ 0 --- 5121.0
+centrifugal_bumblepuppy_5      ---  8/ 2/ 0 --- 438.0
+greenberg                      ---  4/ 4/ 2 --- 75.0
+dllu1                          --- 10/ 0/ 0 --- 551.0
+iocaine_powder                 ---  0/ 5/ 5 --- -240.0
+rps_meta_fix                   ---  3/ 4/ 3 --- -137.0
+testimono                      --- 10/ 0/ 0 --- 10.0

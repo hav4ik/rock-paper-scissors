@@ -23,6 +23,7 @@ def generate_kumoko_file(ensemble_cls,
                          fu_thresh,
                          action_choice,
                          geometric=None,
+                         antigeo_thresh=20,
                          verbose=False,
                          name=None,
                          tmp_dir='/tmp/kumoko/'):
@@ -46,6 +47,7 @@ kumoko_agent = KumokoAgent(
       metameta_scoring='{metameta_scoring}',
       fuck_you_thresh={fu_thresh},
       geometric={geometric},
+      antigeo_thresh={antigeo_thresh},
       verbose={verbose})
 
 def agent(obs, cfg):
@@ -127,6 +129,7 @@ if __name__ == '__main__':
   kumoko_grp.add_argument('-f', '--fu_thresh', type=int, default=None)
   kumoko_grp.add_argument('-g', '--geometric', type=float, default=None)
   kumoko_grp.add_argument('-c', '--action_choice', default='best')
+  kumoko_grp.add_argument('-t', '--antigeo_thresh', type=int, default=20)
   args = parser.parse_args()
 
   # Agent to eval
@@ -142,13 +145,14 @@ if __name__ == '__main__':
           fu_thresh=args.fu_thresh,
           geometric=args.geometric,
           action_choice=args.action_choice,
+          antigeo_thresh=args.antigeo_thresh,
           verbose=True)
 
     # Form list of enemies
     if args.dojo == 'test':
       env = kaggle_environments.make(
           "rps", configuration={"episodeSteps": 100}, debug=True)
-      outcomes = env.run([agent_to_eval, 'opponents/reactionary.py'])
+      outcomes = env.run([agent_to_eval, 'opponents/centrifugal_bumblepuppy_5.py'])
       print('FINAL REWARD:', outcomes[-1][0]['reward'])
 
   else:
@@ -163,6 +167,7 @@ if __name__ == '__main__':
           fu_thresh=args.fu_thresh,
           geometric=args.geometric,
           action_choice=args.action_choice,
+          antigeo_thresh=args.antigeo_thresh,
           verbose=False)
 
     if args.dojo == 'perf':

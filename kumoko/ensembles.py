@@ -16,6 +16,7 @@ from kumoko.strategies.statistical_prediction import StatisticalPredictionStrate
 from kumoko.strategies.geometry import GeometryV4Strategy
 from kumoko.strategies.iocane_powder import IocanePowderStrategy
 from kumoko.strategies.are_you_a_lucker import AreYouALuckerStrategy
+from kumoko.strategies.geobot_beater import GeobotBeaterStrategy
 
 
 class Testing:
@@ -124,6 +125,20 @@ class GeometryV4Augmented:
         generate_meta_strategy_pair(
           GeometryV4Strategy,
           alpha=0.1))
+    do_rotations = [True for _ in strategies]
+    return strategies, do_rotations
+
+
+class VanillaGeoBeater:
+  """Only geobeater, nothing else!
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+    strategies.extend(
+        generate_meta_strategy_pair(GeobotBeaterStrategy))
     do_rotations = [True for _ in strategies]
     return strategies, do_rotations
 
@@ -1284,6 +1299,7 @@ ENSEMBLES = {
   'stat_pred': StatisticalPrediction,
   'geom_v4': GeometryV4,
   'geom_v4_aug': GeometryV4Augmented,
+  'geobeater': VanillaGeoBeater,
 
   # Ensembles with 4 strategies
   '4_strats_v1': FourStratsV1,
