@@ -577,4 +577,14 @@ SCORINGS = {
             0.96,  3.00,    0.00,     -3.00,    0.00,      False,     False,
       ],
       local_meta_scores=False),
+
+  # Combined scoring with grouped local meta-scoring
+  'combined_v2_loc': combined_scoring_factory(
+      scoring_strategies=[
+        'std_dllu_v2', 'static_wnd_v5', 'risk_mng_v3'],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.95,  3.00,    0.00,     -3.00,    0.00,      False,     False,
+      ],
+      local_meta_scores=True),
 }
