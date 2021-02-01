@@ -17,6 +17,8 @@ from kumoko.strategies.geometry import GeometryV4Strategy
 from kumoko.strategies.iocane_powder import IocanePowderStrategy
 from kumoko.strategies.are_you_a_lucker import AreYouALuckerStrategy
 from kumoko.strategies.geobot_beater import GeobotBeaterStrategy
+from kumoko.strategies.greenberg import GreenbergStrategy
+from kumoko.strategies.rps_meta_fix import RPSMetaFixStrategy
 
 
 class Testing:
@@ -1291,6 +1293,164 @@ class TenStratsV1a:
     return strategies, do_rotations
 
 
+class ElevenStratsV1a:
+  """
+  Contains 11 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - Centrifugal Bumblepuppy 4
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  - Are you a lucker?
+  - RPS Meta Fix
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy4))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # Add are you a lucker strategies
+    strategies.extend(
+        generate_meta_strategy_pair(AreYouALuckerStrategy))
+
+    # Add RPS Meta Fix strategies
+    strategies.extend(
+        generate_meta_strategy_pair(RPSMetaFixStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
+
+class TwelveStratsV1a:
+  """
+  Contains 12 type of strategies:
+  - Centrifugal Bumblepuppy 16+H
+  - Centrifugal Bumblepuppy 4
+  - DecisionTree
+  - DecisionTreeV10
+  - HPSDojo (from high performance notebook)
+  - TestingPleaseIgnore
+  - Testimono
+  - RPS Geometry
+  - Iocane Powder (IOU Fight uuu)
+  - Are you a lucker?
+  - Greenberg
+  - RPS Meta Fix
+  """
+  @staticmethod
+  def generate():
+    """List of strategies (including mirror strategies)
+    """
+    strategies = []
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy16h))
+
+    # Add Centrifugal Bumblepuppy 16+H (RFind based)
+    strategies.extend(
+        generate_meta_strategy_pair(CentrifugalBumblepuppy4))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeStrategy))
+
+    # Add decision tree strategies
+    strategies.extend(
+        generate_meta_strategy_pair(DecisionTreeV10Strategy))
+
+    # Add HPS Dojo strategies
+    strategies.extend(
+        generate_meta_strategy_pair(HPSDojoStrategy))
+
+    # Add testing please ignore strategies
+    strategies.extend(
+        generate_meta_strategy_pair(TestingPlsIgnoreStrategy))
+
+    # Add testimono strategy
+    strategies.extend(
+        generate_meta_strategy_pair(TestimonoStrategy))
+
+    # Add RPS Geometry
+    strategies.extend(
+        generate_meta_strategy_pair(GeometryV4Strategy))
+
+    # Add Iocaine Powder strategy
+    strategies.extend(
+        generate_meta_strategy_pair(IocanePowderStrategy))
+
+    # Add are you a lucker strategies
+    strategies.extend(
+        generate_meta_strategy_pair(AreYouALuckerStrategy))
+
+    # Add Greenberg strategies
+    strategies.extend(
+        generate_meta_strategy_pair(GreenbergStrategy))
+
+    # Add RPS Meta Fix strategies
+    strategies.extend(
+        generate_meta_strategy_pair(RPSMetaFixStrategy))
+
+    # By default, rotate everything
+    do_rotations = [True for _ in strategies]
+
+    # Anti Trivial
+    strategies.extend(
+        generate_meta_strategy_pair(
+          AntiTrivialStrategy, mirroring=False))
+    do_rotations.extend([False])
+
+    return strategies, do_rotations
+
 
 ENSEMBLES = {
   # Basic ensembles and single agents
@@ -1334,4 +1494,10 @@ ENSEMBLES = {
 
   # Ensembles with 10 strategies
   '10_strats_v1a': TenStratsV1a,
+
+  # Ensembles with 11 strategies
+  '11_strats_v1a': ElevenStratsV1a,
+
+  # Ensembles with 12 strategies
+  '12_strats_v1a': TwelveStratsV1a,
 }
