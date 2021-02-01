@@ -23,7 +23,7 @@ def generate_kumoko_file(ensemble_cls,
                          fu_thresh,
                          action_choice,
                          geometric=None,
-                         antigeo_thresh=20,
+                         antigeo_thresh=None,
                          verbose=False,
                          name=None,
                          tmp_dir='/tmp/kumoko/'):
@@ -129,7 +129,7 @@ if __name__ == '__main__':
   kumoko_grp.add_argument('-f', '--fu_thresh', type=int, default=None)
   kumoko_grp.add_argument('-g', '--geometric', type=float, default=None)
   kumoko_grp.add_argument('-c', '--action_choice', default='best')
-  kumoko_grp.add_argument('-t', '--antigeo_thresh', type=int, default=20)
+  kumoko_grp.add_argument('-t', '--antigeo_thresh', type=int, default=None)
   args = parser.parse_args()
 
   # Agent to eval
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     if args.dojo == 'test':
       env = kaggle_environments.make(
           "rps", configuration={"episodeSteps": 100}, debug=True)
-      outcomes = env.run([agent_to_eval, 'opponents/centrifugal_bumblepuppy_5.py'])
+      outcomes = env.run([agent_to_eval, 'opponents/reactionary.py'])
       print('FINAL REWARD:', outcomes[-1][0]['reward'])
 
   else:

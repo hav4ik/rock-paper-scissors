@@ -24,7 +24,7 @@ class KumokoAgent:
                metameta_scoring='std_dllu_v1',
                fuck_you_thresh=None,
                geometric=None,
-               antigeo_thresh=20,
+               antigeo_thresh=None,
                verbose=False):
 
     kumoko_cls = partial(Kumoko,

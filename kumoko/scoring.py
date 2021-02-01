@@ -40,6 +40,16 @@ class StandardDllu(BaseScoringOracle):
     self.scoring_funcs = [
         get_dllu_scoring(*cfg) for cfg in scoring_configs]
     self.meta_scoring_func = get_dllu_scoring(*meta_scoring_config)
+    self.score_names = []
+    for cfg in scoring_configs:
+      score_name = f'dllu_[{cfg[0]:.2f}]_' \
+                   f'[{cfg[1]:.1f}]_[{cfg[2]:.1f}]_[{cfg[3]:.1f}]_' \
+                   f'[{cfg[4]:.1f}]'
+      if cfg[5]:
+        score_name += '_dd'
+      if cfg[6]:
+        score_name += '_cz'
+      self.score_names.append(score_name)
 
     self.num_strategies = -1
     self.scores = None
@@ -84,9 +94,7 @@ class StandardDllu(BaseScoringOracle):
     return self.meta_scores
 
   def get_score_names(self):
-    return [
-        f'std_dllu_{i}'
-        for i in range(len(self.scoring_funcs))]
+    return self.score_names
 
 
 def standard_dllu_factory(scoring_configs,
@@ -192,6 +200,12 @@ class RiskManagement(BaseScoringOracle):
     self.loss_penalty_alphas = loss_penalty_alphas
     assert len(self.score_decays) == len(self.window_sizes)
     assert len(self.loss_penalty_alphas) == len(self.window_sizes)
+    self.score_names = []
+    for ws in range(len(self.window_sizes)):
+      score_name = f'risk_mng_[{window_sizes[ws]}]' \
+                   f'_[{score_decays[ws]:.2f}]' \
+                   f'_[{loss_penalty_alphas[ws]:.2f}]'
+      self.score_names.append(score_name)
 
   def set_num_strategies(self, n):
     self.num_strategies = n
@@ -263,7 +277,7 @@ class RiskManagement(BaseScoringOracle):
     return self.meta_scores
 
   def get_score_names(self):
-    return [f'static_wnd_{ws}' for ws in self.window_sizes]
+    return self.score_names
 
 
 def risk_management_factory(window_sizes,
@@ -282,14 +296,20 @@ def risk_management_factory(window_sizes,
 class CombinedScoring(BaseScoringOracle):
   def __init__(self,
                scoring_strategies,
-               use_local_meta_scores=False,
-               global_score_choice=None):
+               meta_scoring_config):
     super().__init__()
     self.scoring_strategies = [
-        scoring_cls()
-        for scoring_cls in scoring_strategies]
+        SCORINGS[scoring_clsname]()
+        for scoring_clsname in scoring_strategies]
+    self.score_names = []
+    for scoring_strategy in self.scoring_strategies:
+      self.score_names.extend(scoring_strategy.get_score_names())
+    self.meta_scoring_func = get_dllu_scoring(*meta_scoring_config)
+
     self.num_strategies = -1
     self.combined_scores = None
+    self.concatenated_scores = None
+    self.meta_scores = None
 
   def set_num_strategies(self, n):
     self.num_strategies = n
@@ -303,6 +323,55 @@ class CombinedScoring(BaseScoringOracle):
     self.combined_scores = [
         scoring_strategy.get_initial_scores()
         for scoring_strategy in self.scoring_strategies]
+
+    num_scoring_funcs = np.sum([
+      scores.shape[0] for scores in self.combined_scores])
+    self.meta_scores = np.zeros((num_scoring_funcs, ))
+
+  def compute_scores(self, proposed_moves, his_move):
+    """Calculate scores for each strategy"""
+    assert len(proposed_moves) == self.num_strategies
+    # Combined scores collects all scoring matrices
+    # from each scoring strategy
+    self.combined_scores = [
+        scoring_strategy.compute_scores(proposed_moves, his_move)
+        for scoring_strategy in self.scoring_strategies]
+    self.scores = np.concatenate(
+        self.combined_scores, axis=0)
+    assert len(self.scores.shape) == 2
+    assert self.scores.shape[1] == self.num_strategies
+    return self.scores
+
+  def compute_meta_scores(self, proposed_moves, his_move):
+    """Generates a meta scoring function
+    """
+    assert len(proposed_moves) == len(self.meta_scores)
+    for sf in range(len(self.meta_scores)):
+      self.meta_scores[sf] = self.meta_scoring_func(
+          self.meta_scores[sf],
+          proposed_moves[sf], his_move)
+    return self.meta_scores
+
+  def get_initial_scores(self):
+    combined_initial_scores = np.concatenate(
+        self.combined_scores, axis=0)
+    assert len(combined_initial_scores.shape) == 2
+    assert combined_initial_scores.shape[1] == self.num_strategies
+    return combined_initial_scores
+
+  def get_initial_meta_scores(self):
+    """Initial meta-scores at step 0"""
+    return self.meta_scores
+
+  def get_score_names(self):
+    return self.score_names
+
+
+def combined_scoring_factory(scoring_strategies,
+                             meta_scoring_config):
+  return partial(CombinedScoring,
+                 scoring_strategies,
+                 meta_scoring_config)
 
 
 SCORINGS = {
@@ -390,4 +459,12 @@ SCORINGS = {
             0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
       ],
       safeguard=0.20),
+
+  'combined_v1': combined_scoring_factory(
+      scoring_strategies=[
+        'std_dllu_v1', 'static_wnd_v2', 'risk_mng_v1'],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.99,  3.00,    0.00,     -3.00,    0.00,      False,     False,
+      ]),
 }
