@@ -174,6 +174,8 @@ class Kumoko:
         len(self.proposed_meta_actions)
 
     best_meta_action_idx = np.argmax(self.meta_scores)
+    if self.meta_scores.max() < 1e-4:
+      best_meta_action_idx = np.random.randint(len(self.proposed_meta_actions))
     self.our_last_move = \
       self.proposed_meta_actions[best_meta_action_idx]
     self.last_chosen_meta_idx = best_meta_action_idx

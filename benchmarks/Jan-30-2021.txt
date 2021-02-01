@@ -87,3 +87,26 @@ dllu1                          --- 10/ 0/ 0 --- 551.0
 iocaine_powder                 ---  0/ 5/ 5 --- -240.0
 rps_meta_fix                   ---  3/ 4/ 3 --- -137.0
 testimono                      --- 10/ 0/ 0 --- 10.0
+
+
+
+python dojo.py dojo_cfg/rpscontest.yaml -e 10_strats_v1a -u -s combined_v1 -t 10 -m -c vote5 -w std_dllu_v2_nodec
+Loading environment football failed: No module named 'gfootball'
+
+Evaluating /tmp/kumoko/kumoko_da7de6271d544acf90d9ee10684e560f.py:
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+iocaine_powder                 ---  7/ 2/ 1 --- 265.0
+geometry                       ---  6/ 2/ 2 --- 176.0
+
+
+python dojo.py dojo_cfg/rpscontest.yaml -e 10_strats_v1a -u -s combined_v1 -t 10 -m -c vote5 -w std_dllu_v2_nodec
+Loading environment football failed: No module named 'gfootball'
+
+Evaluating /tmp/kumoko/kumoko_a542f47c3da64f00b3d82689cc6f8fe1.py:
+-------------------------------------------------------
+opponent_name                  ---  w/ t/ l --- avg
+-------------------------------------------------------
+iocaine_powder                 ---  3/ 5/ 2 --- -2.0
+geometry                       ---  2/ 5/ 3 --- -11.0

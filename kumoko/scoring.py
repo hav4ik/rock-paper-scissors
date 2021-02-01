@@ -296,7 +296,8 @@ def risk_management_factory(window_sizes,
 class CombinedScoring(BaseScoringOracle):
   def __init__(self,
                scoring_strategies,
-               meta_scoring_config):
+               meta_scoring_config,
+               local_meta_scores=False):
     super().__init__()
     self.scoring_strategies = [
         SCORINGS[scoring_clsname]()
@@ -310,6 +311,8 @@ class CombinedScoring(BaseScoringOracle):
     self.combined_scores = None
     self.concatenated_scores = None
     self.meta_scores = None
+    self.ranges = []
+    self.local_meta_scores = local_meta_scores
 
   def set_num_strategies(self, n):
     self.num_strategies = n
@@ -323,9 +326,25 @@ class CombinedScoring(BaseScoringOracle):
     self.combined_scores = [
         scoring_strategy.get_initial_scores()
         for scoring_strategy in self.scoring_strategies]
+    range_counter = 0
 
     num_scoring_funcs = np.sum([
       scores.shape[0] for scores in self.combined_scores])
+
+    if self.local_meta_scores:
+      for scores in self.combined_scores:
+        self.ranges.append(
+            (range_counter, range_counter + scores.shape[0]))
+        range_counter += scores.shape[0]
+      for i, r in enumerate(self.ranges[:-1]):
+        assert self.ranges[i+1][0] == self.ranges[i][1]
+        assert self.ranges[i][0] < self.ranges[i][1]
+      for i, r in enumerate(self.ranges):
+        assert len(self.combined_scores[i]) == r[1] - r[0]
+      assert self.ranges[-1][1] == num_scoring_funcs
+      assert len(self.ranges) == len(self.scoring_strategies)
+
+    # the len of meta scores still have to be as long as all strats
     self.meta_scores = np.zeros((num_scoring_funcs, ))
 
   def compute_scores(self, proposed_moves, his_move):
@@ -345,12 +364,47 @@ class CombinedScoring(BaseScoringOracle):
   def compute_meta_scores(self, proposed_moves, his_move):
     """Generates a meta scoring function
     """
-    assert len(proposed_moves) == len(self.meta_scores)
-    for sf in range(len(self.meta_scores)):
-      self.meta_scores[sf] = self.meta_scoring_func(
-          self.meta_scores[sf],
-          proposed_moves[sf], his_move)
-    return self.meta_scores
+    if not self.local_meta_scores:
+      # Flat score computing
+      assert len(proposed_moves) == len(self.meta_scores)
+      for sf in range(len(self.meta_scores)):
+        self.meta_scores[sf] = self.meta_scoring_func(
+            self.meta_scores[sf],
+            proposed_moves[sf], his_move)
+      return self.meta_scores
+    else:
+      # Using meta scores of each group, and only apply global
+      # scoring after that
+      assert len(proposed_moves) == self.ranges[-1][1]
+      assert len(self.scoring_strategies) == len(self.ranges)
+      local_meta_scores = [
+          strategy.compute_meta_scores(
+            proposed_moves[rng[0]:rng[1]], his_move)
+          for rng, strategy in zip(
+            self.ranges, self.scoring_strategies)]
+      local_chosen_move_idxs = []
+      for rng, local_meta_score in zip(self.ranges, local_meta_scores):
+        assert len(local_meta_score) == len(proposed_moves[rng[0]:rng[1]])
+        best_meta_action_idx = np.argmax(local_meta_score)
+        local_chosen_move_idxs.append(best_meta_action_idx)
+
+      # After computing local (group) meta scores, compute global one
+      for sf in range(len(self.meta_scores)):
+        self.meta_scores[sf] = self.meta_scoring_func(
+            self.meta_scores[sf],
+            proposed_moves[sf], his_move)
+
+      # One-hot encoding for the winning local strategy. This can be
+      # also replaced with softmax with temperature, but no need here
+      # as only the max one will be chosen anyways.
+      def one_hot(a, num_classes):
+        return np.squeeze(np.eye(num_classes)[a])
+
+      # Correct the scores
+      for rng, local_chosen_move_idx in zip(self.ranges, local_chosen_move_idxs):
+        self.meta_scores[rng[0]:rng[1]] *= one_hot(
+            local_chosen_move_idx, rng[1] - rng[0])
+      return self.meta_scores
 
   def get_initial_scores(self):
     combined_initial_scores = np.concatenate(
@@ -368,10 +422,12 @@ class CombinedScoring(BaseScoringOracle):
 
 
 def combined_scoring_factory(scoring_strategies,
-                             meta_scoring_config):
+                             meta_scoring_config,
+                             local_meta_scores):
   return partial(CombinedScoring,
-                 scoring_strategies,
-                 meta_scoring_config)
+                 scoring_strategies=scoring_strategies,
+                 meta_scoring_config=meta_scoring_config,
+                 local_meta_scores=local_meta_scores)
 
 
 SCORINGS = {
@@ -466,5 +522,50 @@ SCORINGS = {
       meta_scoring_config=[
           # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
             0.99,  3.00,    0.00,     -3.00,    0.00,      False,     False,
+      ],
+      local_meta_scores=False),
+
+  # DLLU-based scorings: for furiously fast rotations
+  'std_dllu_v2': standard_dllu_factory(
+      scoring_configs=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+          [ 0.80,  3.00,    0.00,     -3.00,    0.00,      False,     False    ],
+          [ 0.87,  3.30,    -0.90,    -3.00,    0.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      False,     False    ],
+          [ 1.00,  3.00,    0.00,     -3.00,    1.00,      True,      False    ],
+      ],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.94,  3.00,    0.00,     -3.00,    0.87,      False,     True,
       ]),
+
+  # Static window scoring: more conservative, long-term planning
+  'static_wnd_v5': static_window_factory(
+      window_sizes=[10, 20, 50],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.96,  3.00,    0.00,     -3.00,    0.00,      False,     True,
+      ],
+      safeguard=0.25),
+
+  # Risk management scoring:
+  'risk_mng_v3': risk_management_factory(
+      window_sizes=[10, 20, 50, 75],
+      score_decays=[0.94, 0.96, 0.97, 0.99],
+      loss_penalty_alphas=[0.1, 0.1, 0.1, 0.1, 0.1],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.97,  3.00,    0.00,     -3.00,    0.00,      False,     True,
+      ],
+      safeguard=0.20),
+
+  # Combined scoring with grouped local meta-scoring
+  'combined_v1_loc': combined_scoring_factory(
+      scoring_strategies=[
+        'std_dllu_v2', 'static_wnd_v5', 'risk_mng_v1'],
+      meta_scoring_config=[
+          # decay, win_val, draw_val, lose_val, drop_prob, drop_draw, clip_zero
+            0.99,  3.00,    0.00,     -3.00,    0.00,      False,     False,
+      ],
+      local_meta_scores=True),
 }

@@ -16,3 +16,12 @@
     fu_thresh: null
     action_choice: best
 
+- name: 10_strats_v1a
+  kwargs:
+    ensemble_cls: 10_strats_v1a
+    scoring_cls: static_wnd_v2
+    metameta_scoring: std_dllu_v1
+    use_meta: true
+    fu_thresh: null
+    action_choice: vote5
+

@@ -21,6 +21,16 @@ METAMETA_SCORINGS = {
         drop_prob=0.00,
         drop_draw=False,
         clip_zero=True),
+
+    # The old one is when there's no zeroing
+    'std_dllu_v2_nodec': get_dllu_scoring(
+        decay=0.96,
+        win_value=3.0,
+        draw_value=0.0,
+        lose_value=-3.0,
+        drop_prob=0.00,
+        drop_draw=False,
+        clip_zero=True),
 }
 
 

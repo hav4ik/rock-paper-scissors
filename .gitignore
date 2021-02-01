@@ -130,3 +130,5 @@ dmypy.json
 
 # Vim stuff
 *.sw[pon]
+inlined/*
+rps_bandit*
